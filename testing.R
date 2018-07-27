@@ -7,4 +7,5 @@ nowe <- matrix(data = elo, nrow = 8, ncol = 12)
 rownames(nowe) <- c("A", "B", "C", "D", "E", "F", "G", "H")
 colnames(nowe) <- seq(1,12)
 
-# BCD 2 , EFG 2, BCD 3, EFG 3 4 pożywki dla jednego szczepu
+# BCD 2 , EFG 2, BCD 3, EFG 3 to 4 pożywki dla jednego szczepu
+
