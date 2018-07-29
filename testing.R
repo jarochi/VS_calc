@@ -11,6 +11,11 @@ colnames(nowe) <- seq(1,12)
 
 # BCD 2 , EFG 2, BCD 3, EFG 3 to 4 pożywki dla jednego szczepu
 
+species <- c("5270", "5271", "5272", "5275", "5276")
+
+mediums <- c("LB10", "TSB", 
+             "BHI", "M63")
+
 nowe <- nowe[-1,]
 nowe <- nowe[-7,]
 
@@ -20,18 +25,13 @@ nowe <- nowe[,-1]
 nowe <- nowe[,-11]
 
 
-# # każda kolumna to oddzielna pożywka oprócz dwóch pierwszych, bo to jakieś kontrole czy coś i dwóch ostatnich (dopytać dziewczyn co to)
-# nowa_ramka <- matrix(nowe,nrow = 3, ncol = 24)
-
+# każda kolumna to oddzielna pożywka oprócz dwóch pierwszych, bo to jakieś kontrole czy coś i dwóch ostatnich (dopytać dziewczyn co to)
+nowa_ramka <- matrix(nowe,nrow = 3, ncol = 20)
+colnames(nowa_ramka) <- rep(mediums, 5)
 # dodać wiersz u góry i na dole z pożywkami, nazwa kolumny to szczep 
 
-mediums <- c("LB10", "TSB", 
-             "BHI", "M63")
-
-colnames(nowa_ramka) <- mediums
-
 colMeans(nowa_ramka)
-colMedians(nowa_ramka)
+mediany <- colMedians(nowa_ramka)
 
 ### przepisać dane z CV
 
@@ -48,6 +48,13 @@ absorbance <- c(0.204, 0.345, 0.251, 0.158, 0.141, 0.283,
 
 absorbance <- matrix(absorbance, nrow = 6, ncol = 10)
 
+rownames(absorbance) <- c("B", "C", "D", "E", "F", "G")
+colnames(absorbance) <- seq(2,11)
+
+new_absorbance <- matrix(absorbance,nrow = 3, ncol = 20)
+colnames(new_absorbance) <- rep(mediums, 5)
+
+absorbance_median <- colMedians(new_absorbance)
 # pearson correlation
 
-
+cor(mediany, absorbance_median, method = "pearson")
