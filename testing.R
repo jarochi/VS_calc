@@ -168,9 +168,5 @@ ggplot(VS_aggr, aes(x = R2016, y = R2018)) +
   geom_point() +
   facet_wrap(~ medium)
 
-tmp <- function(x, y) {
-  browser()
-}
-
 group_by(VS_aggr, medium) %>% 
   summarise(rho = cor(R2016, R2018, method = "spearman"))
