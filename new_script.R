@@ -60,7 +60,6 @@ ggplot(CV_all, aes(x = date, y = value)) +
   facet_wrap(~ strain)
 
 
-
 CV_aggr <- group_by(CV_all, strain, date, replicate) %>% 
   summarise(value = median(value)) %>% 
   summarise(value = median(value)) %>% 
