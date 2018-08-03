@@ -237,3 +237,8 @@ data.table(group_by(VS_aggr1, medium) %>%
 data.table(group_by(VS_aggr1, strain) %>% 
    summarise(rho = cor(R2016, R2018, method = "spearman")))
 ```
+
+## Congo red assay and Calcofluor assay comparision
+```{r}
+read.csv("data/wynik.csv")
+```
