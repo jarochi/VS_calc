@@ -173,4 +173,4 @@ tmp <- function(x, y) {
 }
 
 group_by(VS_aggr, medium) %>% 
-  summarise(rho = cor(R2016, R2018, method = "pearson"))
+  summarise(rho = cor(R2016, R2018, method = "spearman"))
