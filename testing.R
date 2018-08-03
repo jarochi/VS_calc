@@ -84,3 +84,93 @@ for (i in seq(1:5)) {
   per_cor <- cor(CV_LB[i], abs_med[i], method = "pearson")
   print(per_cor)
 }
+
+# CV by Michal -----------------------------------------------
+
+library(dplyr)
+library(reshape2)
+
+get_last_character <- function(x) {
+  len_x <- nchar(x)
+  substr(x, len_x, len_x)
+}
+
+raw_dat <- read.csv2("cv_and_videoscan.csv") %>% 
+  mutate(strain = factor(strain)) %>% 
+  melt(variable.name = "experiment") %>% 
+  mutate(method = ifelse(grepl("CV", experiment), "CV", "Videoscan"),
+         replicate = get_last_character(as.character(experiment)),
+         medium = substr(experiment, 0, 3)) 
+
+
+CV2018 <- absorbance %>% 
+  t %>% 
+  data.frame() %>% 
+  slice((1L:5)*2 - 1) %>% 
+  select(B, C, D) %>% 
+  mutate(strain = c("5270", "5271", "5272", "5275", "5276"),
+         method = "CV",
+         date = "R2018") %>% 
+  melt(variable.name = "replicate") %>% 
+  mutate(replicate = as.character(as.numeric(replicate)))
+
+CV_all <- bind_rows(select(raw_dat, strain, method, value, replicate) %>% 
+                      filter(method == "CV", strain %in% c("5270", "5271", "5272", "5275", "5276")) %>% 
+                      mutate(date = "R2016"),
+                    CV2018)
+
+library(ggplot2)
+
+ggplot(CV_all, aes(x = date, y = value)) +
+  geom_point() +
+  facet_wrap(~ strain)
+
+library(magrittr)
+
+CV_aggr <- group_by(CV_all, strain, date, replicate) %>% 
+  summarise(value = median(value)) %>% 
+  summarise(value = median(value)) %>% 
+  dcast(strain ~ date)
+
+ggplot(CV_aggr, aes(x = R2016, y = R2018)) +
+  geom_point()
+
+# Michal - VS ---------------------------------------------
+
+raw_vs <- nowa_ramka
+
+colnames(raw_vs) <- paste0(colnames(raw_vs), "_", c("5270", "5271", "5272", "5275", "5276") %>% lapply(rep, 4) %>% unlist)
+
+VS_all <- bind_rows(select(raw_dat, strain, method, value, replicate, medium) %>% 
+            filter(method == "Videoscan", strain %in% c("5270", "5271", "5272", "5275", "5276")) %>% 
+            mutate(date = "R2016"),
+          melt(raw_vs) %>% 
+            rename(replicate = Var1) %>% 
+            mutate(medium = sapply(strsplit(as.character(Var2), split = "_"), first),
+                   strain = sapply(strsplit(as.character(Var2), split = "_"), last),
+                   replicate = as.character(replicate)) %>% 
+            select(-Var2) %>% 
+            mutate(medium = ifelse(medium == "LB10", "LB_", medium),
+                   date = "R2018",
+                   method = "Videoscan"))
+
+ggplot(VS_all, aes(x = date, y = value)) +
+  geom_point() +
+  facet_grid(medium ~ strain)
+
+
+VS_aggr <- group_by(VS_all, strain, medium, date, replicate) %>% 
+  summarise(value = median(value)) %>% 
+  summarise(value = median(value)) %>% 
+  dcast(strain + medium ~ date)
+
+ggplot(VS_aggr, aes(x = R2016, y = R2018)) +
+  geom_point() +
+  facet_wrap(~ medium)
+
+tmp <- function(x, y) {
+  browser()
+}
+
+group_by(VS_aggr, medium) %>% 
+  summarise(rho = cor(R2016, R2018, method = "pearson"))
