@@ -11,7 +11,7 @@ colnames(nowe) <- seq(1,12)
 
 # BCD 2 , EFG 2, BCD 3, EFG 3 to 4 pożywki dla jednego szczepu
 
-species <- c("5270", "5271", "5272", "5275", "5276")
+species <- c("5270|EAEC", "5271|EAEC", "5272|EAEC", "5275|EAEC", "5276|EcN?")
 
 mediums <- c("LB10", "TSB", 
              "BHI", "M63")
@@ -58,3 +58,29 @@ absorbance_median <- colMedians(new_absorbance)
 # pearson correlation
 
 cor(mediany, absorbance_median, method = "pearson")
+
+
+###########################
+cv_vs <- read.csv2("cv_and_videoscan.csv", header = TRUE, stringsAsFactors = FALSE)
+cv_vs <- cv_vs[-c(1:105),]
+nkol <- nrow(cv_vs)
+cv_vs <- cv_vs[-c(6:nkol),]
+rownames(cv_vs) <- c("5270", "5271", "5272", "5275", "5276")
+
+CV_LB <- apply(cv_vs[, 3:14], 1, median) 
+VS_LB <- apply(cv_vs[, 15:17], 1, median) 
+VS_TSB <- apply(cv_vs[, 18:20], 1, median) 
+VS_BHI <- apply(cv_vs[, 21:23], 1, median) 
+VS_M63 <- apply(cv_vs[, 24:26], 1, median) 
+
+## tylko próby
+abs_med <- absorbance_median[c(1, 5, 9, 13, 17)]
+abs_med<- matrix(abs_med, nrow = 1, ncol = 5)
+cv_lb <- matrix(CV_LB, nrow = 1, ncol = 5)
+
+
+
+for (i in seq(1:5)) {
+  per_cor <- cor(CV_LB[i], abs_med[i], method = "pearson")
+  print(per_cor)
+}
