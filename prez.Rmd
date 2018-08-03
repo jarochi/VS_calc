@@ -1,5 +1,5 @@
 ---
-title: "raport"
+title: "report"
 output: ioslides_presentation
 ---
 
@@ -147,7 +147,7 @@ VS_aggr1 <- group_by(VS_all1, strain, medium, date, replicate) %>%
   dcast(strain + medium ~ date)
 ```
 
-## Wynik
+## Crystal Violet - LB ~ strain comparision
 
 ```{r}
 ggplot(CV_all, aes(x = date, y = value)) +
@@ -155,14 +155,14 @@ ggplot(CV_all, aes(x = date, y = value)) +
   facet_wrap(~ strain)
 ```
 
-## new
+## CV - is data correlated
 
 ```{r}
 ggplot(CV_aggr, aes(x = R2016, y = R2018)) +
   geom_point()
 ```
 
-## Median
+## Median of results grouped by strain
 ```{r}
 data.table(group_by(CV_all, strain, date, replicate) %>% 
   summarise(value = median(value)) %>% 
@@ -170,27 +170,27 @@ data.table(group_by(CV_all, strain, date, replicate) %>%
   dcast(strain ~ date))
 ```
 
-##
+## Spearman correlation test, grouped by strain
 ```{r}
 data.table(group_by(CV_aggr, strain) %>%
     summarise(rho = cor(R2016, R2018, method = "spearman")))
 ```
 
-## KOZA
+## KOZA | species ~ medium comparision
 ```{r}
 ggplot(VS_all, aes(x = date, y = value)) +
   geom_point() +
   facet_grid(medium ~ strain)
 ```
 
-##
+## Correlation of the data
 ```{r}
 ggplot(VS_aggr, aes(x = R2016, y = R2018)) +
   geom_point() +
   facet_wrap(~ medium)
 ```
 
-## Median
+## Median of results grouped by strain
 ```{r}
 data.table(group_by(VS_all, strain, date, replicate) %>% 
   summarise(value = median(value)) %>% 
@@ -198,27 +198,30 @@ data.table(group_by(VS_all, strain, date, replicate) %>%
   dcast(strain ~ date))
 ```
 
-## Spearman
+## Spearman correlation test, grouped by medium and strain
 ```{r}
 data.table(group_by(VS_aggr, medium) %>% 
    summarise(rho = cor(R2016, R2018, method = "spearman")))
+
+data.table(group_by(VS_aggr, strain) %>% 
+   summarise(rho = cor(R2016, R2018, method = "spearman")))
 ```
 
-## ANIA
+## ANIA | species ~ medium comparision
 ```{r}
 ggplot(VS_all1, aes(x = date, y = value)) +
   geom_point() +
   facet_grid(medium ~ strain)
 ```
 
-##
+## Correlation of the data
 ```{r}
 ggplot(VS_aggr1, aes(x = R2016, y = R2018)) +
   geom_point() +
   facet_wrap(~ medium)
 ```
 
-## Median
+## Median of results grouped by strain
 ```{r}
 data.table(group_by(VS_all1, strain, date, replicate) %>% 
   summarise(value = median(value)) %>% 
@@ -226,8 +229,11 @@ data.table(group_by(VS_all1, strain, date, replicate) %>%
   dcast(strain ~ date))
 ```
 
-## Spearman
+## Spearman correlation test, grouped by medium  and strain
 ```{r}
 data.table(group_by(VS_aggr1, medium) %>% 
+   summarise(rho = cor(R2016, R2018, method = "spearman")))
+
+data.table(group_by(VS_aggr1, strain) %>% 
    summarise(rho = cor(R2016, R2018, method = "spearman")))
 ```
