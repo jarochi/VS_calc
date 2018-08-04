@@ -157,9 +157,24 @@ Parsed: `r Sys.Date()`.
 
 Repeat experiments from Schiebel et al. (2017).
 
+- Congo Red
+- Calcofluor
+- Crystal Violet
+- VideoScan
+
 ## Materials
 
-Strains used: 5270, 5271, 5272, 5275, 5276.
+Strains used: 
+
+- E. coli MG 1655
+- 1917 Nissle (EcN)
+- 5212
+- 5270
+- 5271
+- 5272
+- 5275
+- 5276
+- 5644
 
 ## Crystal Violet - LB ~ strain comparison
 
@@ -188,8 +203,9 @@ group_by(CV_all, strain, date, replicate) %>%
 
 ## Spearman correlation test, grouped by strain
 ```{r}
-data.table(group_by(CV_aggr, strain) %>%
-    summarise(rho = cor(R2016, R2018, method = "spearman")))
+group_by(CV_aggr, strain) %>%
+    summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
+    data.table()
 ```
 
 ## KOZA | species ~ medium comparison
@@ -208,19 +224,21 @@ ggplot(VS_aggr, aes(x = R2016, y = R2018)) +
 
 ## Median of results grouped by strain
 ```{r}
-data.table(group_by(VS_all, strain, date, replicate) %>% 
+group_by(VS_all, strain, date, replicate) %>% 
   summarise(value = median(value)) %>% 
   summarise(value = median(value)) %>% 
-  dcast(strain ~ date))
+  dcast(strain ~ date) %>% data.table()
 ```
 
 ## Spearman correlation test, grouped by medium and strain
 ```{r}
-data.table(group_by(VS_aggr, medium) %>% 
-   summarise(rho = cor(R2016, R2018, method = "spearman")))
+group_by(VS_aggr, medium) %>% 
+   summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
+    data.table()
 
-data.table(group_by(VS_aggr, strain) %>% 
-   summarise(rho = cor(R2016, R2018, method = "spearman")))
+group_by(VS_aggr, strain) %>% 
+   summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
+    data.table()
 ```
 
 ## ANIA | species ~ medium comparison
@@ -239,19 +257,22 @@ ggplot(VS_aggr1, aes(x = R2016, y = R2018)) +
 
 ## Median of results grouped by strain
 ```{r}
-data.table(group_by(VS_all1, strain, date, replicate) %>% 
+group_by(VS_all1, strain, date, replicate) %>% 
   summarise(value = median(value)) %>% 
   summarise(value = median(value)) %>% 
-  dcast(strain ~ date))
+  dcast(strain ~ date) %>% 
+  data.table()
 ```
 
 ## Spearman correlation, grouped by medium  and strain
 ```{r}
-data.table(group_by(VS_aggr1, medium) %>% 
-   summarise(rho = cor(R2016, R2018, method = "spearman")))
+group_by(VS_aggr1, medium) %>% 
+    summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
+    data.table()
 
-data.table(group_by(VS_aggr1, strain) %>% 
-   summarise(rho = cor(R2016, R2018, method = "spearman")))
+group_by(VS_aggr1, strain) %>% 
+    summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
+    data.table()
 ```
 
 ## Congo red assay and Calcofluor assay comparison
