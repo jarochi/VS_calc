@@ -1,5 +1,5 @@
 ---
-title: "report"
+title: "The first biofilm cultures"
 output: ioslides_presentation
 ---
 
@@ -147,12 +147,27 @@ VS_aggr1 <- group_by(VS_all1, strain, medium, date, replicate) %>%
   dcast(strain + medium ~ date)
 ```
 
-## Crystal Violet - LB ~ strain comparision
+## Overview
+
+Created: 2018-08-04.
+
+Parsed: `r Sys.Date()`.
+
+## Aim 
+
+Repeat experiments from Schiebel et al. (2017).
+
+## Materials
+
+Strains used: 5270, 5271, 5272, 5275, 5276.
+
+## Crystal Violet - LB ~ strain comparison
 
 ```{r}
 ggplot(CV_all, aes(x = date, y = value)) +
   geom_point() +
-  facet_wrap(~ strain)
+  facet_wrap(~ strain) +
+  theme_bw()
 ```
 
 ## CV - is data correlated
@@ -164,10 +179,11 @@ ggplot(CV_aggr, aes(x = R2016, y = R2018)) +
 
 ## Median of results grouped by strain
 ```{r}
-data.table(group_by(CV_all, strain, date, replicate) %>% 
+group_by(CV_all, strain, date, replicate) %>% 
   summarise(value = median(value)) %>% 
   summarise(value = median(value)) %>% 
-  dcast(strain ~ date))
+  dcast(strain ~ date) %>% 
+  data.table
 ```
 
 ## Spearman correlation test, grouped by strain
@@ -176,7 +192,7 @@ data.table(group_by(CV_aggr, strain) %>%
     summarise(rho = cor(R2016, R2018, method = "spearman")))
 ```
 
-## KOZA | species ~ medium comparision
+## KOZA | species ~ medium comparison
 ```{r}
 ggplot(VS_all, aes(x = date, y = value)) +
   geom_point() +
@@ -207,7 +223,7 @@ data.table(group_by(VS_aggr, strain) %>%
    summarise(rho = cor(R2016, R2018, method = "spearman")))
 ```
 
-## ANIA | species ~ medium comparision
+## ANIA | species ~ medium comparison
 ```{r}
 ggplot(VS_all1, aes(x = date, y = value)) +
   geom_point() +
@@ -229,7 +245,7 @@ data.table(group_by(VS_all1, strain, date, replicate) %>%
   dcast(strain ~ date))
 ```
 
-## Spearman correlation test, grouped by medium  and strain
+## Spearman correlation, grouped by medium  and strain
 ```{r}
 data.table(group_by(VS_aggr1, medium) %>% 
    summarise(rho = cor(R2016, R2018, method = "spearman")))
@@ -238,7 +254,7 @@ data.table(group_by(VS_aggr1, strain) %>%
    summarise(rho = cor(R2016, R2018, method = "spearman")))
 ```
 
-## Congo red assay and Calcofluor assay comparision
+## Congo red assay and Calcofluor assay comparison
 ```{r}
 read.csv("data/wynik.csv")
 ```
