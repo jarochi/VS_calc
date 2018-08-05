@@ -14,6 +14,7 @@ library(reshape2)
 library(ggplot2)
 library(magrittr)
 library(data.table)
+library(grid)
 
 get_last_character <- function(x) {
   len_x <- nchar(x)
@@ -294,12 +295,19 @@ group_by(VS_aggr1, strain) %>%
 read.csv("data/wynik.csv")
 ```
 
-## Congo Red and CalcoFluor
+## Congo Red
+<!-- | girls vs Jule -->
 <!-- ![](data/CR1.jpg){ height=50% } -->
 <img class="fit" src="data/CR1.jpg"">
-<img class="fit" src="data/CR2.jpg"">
+<img class="fit" src="data/jule.jpg"">
 
-## Congo Red and CalcoFluor
+## Congo Red
 
-<img class="fit" src="data/CR3.jpg"">
-<img class="fit" src="data/CF1.jpg"">
+<img class="fit" src="data/CR2.jpg">
+<img class="fit" src="data/CR3.jpg">
+
+## CalcoFluor
+<!-- | girls vs Jule -->
+
+<img class="fit" src="data/CF1.jpg">
+<img class="fit" src="data/jule1.jpg">
