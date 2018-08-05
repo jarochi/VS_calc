@@ -1,0 +1,28 @@
+---
+title: "GWAS in biofilm studies"
+author: "Michał Burdukiewicz"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Increasing role of biofilm in human health
+
+Recent studies are reporting more and more way of biofilm (and biofilm-producing bacteria) affecting human health.
+
+Chapman, lupus, Crohn disease, inflammatory bowel disease, colorectal cancer
+
+## Development of biofilms
+
+Although general regulators of the biofilm biogenesis are known, there are still no large-scale studies associating phenotype (biofilm production) with genotype.
+
+Keio collction here
+
+## Available strains
+
+The collection of **Salmonella** ($n = 50$) and **Escherichia** ($n = 200$) strains is currently being sequenced proving an unique insight into genomic variability of **Enterobacteriaceae** (CHECK NAMES). 
+
+
+modulate immunity in protective or pathological manner

@@ -11,6 +11,7 @@ library(reshape2)
 library(ggplot2)
 library(magrittr)
 library(data.table)
+library(ggbeeswarm)
 
 get_last_character <- function(x) {
   len_x <- nchar(x)
@@ -60,7 +61,7 @@ CV2018 <- absorbance %>%
 
 CV_all <- bind_rows(select(raw_dat, strain, method, value, replicate) %>% 
                       filter(method == "CV", strain %in% c("5270", "5271", "5272", "5275", "5276")) %>% 
-                      mutate(date = "R2016"),
+                      mutate(date = "R2017"),
                     CV2018)
 
 
@@ -94,7 +95,7 @@ colnames(raw_vs) <- paste0(colnames(raw_vs), "_", c("5270", "5271", "5272", "527
 
 VS_all <- bind_rows(select(raw_dat, strain, method, value, replicate, medium) %>% 
                       filter(method == "Videoscan", strain %in% c("5270", "5271", "5272", "5275", "5276")) %>% 
-                      mutate(date = "R2016"),
+                      mutate(date = "R2017"),
                     melt(raw_vs) %>% 
                       rename(replicate = Var1) %>% 
                       mutate(medium = sapply(strsplit(as.character(Var2), split = "_"), first),
@@ -130,7 +131,7 @@ colnames(raw_vs1) <- paste0(colnames(raw_vs1), "_", c("5270", "5271", "5272", "5
 
 VS_all1 <- bind_rows(select(raw_dat, strain, method, value, replicate, medium) %>% 
                       filter(method == "Videoscan", strain %in% c("5270", "5271", "5272", "5275", "5276")) %>% 
-                      mutate(date = "R2016"),
+                      mutate(date = "R2017"),
                     melt(raw_vs1) %>% 
                       rename(replicate = Var1) %>% 
                       mutate(medium = sapply(strsplit(as.character(Var2), split = "_"), first),
@@ -176,23 +177,49 @@ Strains used:
 - 5276
 - 5644
 
-## Crystal Violet - LB ~ strain comparison
+## Methods
+
+We compare results computing the correlation coefficient between results from Schiebel et al. (2017) and new measurements from 2018. Results are annotated as **R2017** and **R2018** respectively. 
+
+In the case of a perfect reproduction of an experiment, the correlation coefficient should be 1. If both experiments are giving different results, the correlation coefficient is 0.
+
+To account for normalization and baselining, we are using Spearman's correlation coefficient which relies on ranks instead of raw values.s
+
+## Crystal Violet (CV)
 
 ```{r}
 ggplot(CV_all, aes(x = date, y = value)) +
-  geom_point() +
+  geom_quasirandom() +
   facet_wrap(~ strain) +
   theme_bw()
 ```
 
-## CV - is data correlated
+## CV: correlation of median results
 
 ```{r}
-ggplot(CV_aggr, aes(x = R2016, y = R2018)) +
-  geom_point()
+ggplot(CV_aggr, aes(x = R2017, y = R2018, color = strain)) +
+  geom_point(size = 4) +
+  #geom_smooth(method = "lm", color = "black", formula = y ~ x) +
+  theme_bw()
 ```
 
-## Median of results grouped by strain
+Pearson's correlation: `r CV_aggr %$% cor(R2017, R2018, method = "pearson") %>% round(2)`.
+
+## CV: correlation of median results
+
+```{r}
+ggplot(CV_aggr, aes(x = rank(R2017), y = rank(R2018), color = strain)) +
+  geom_point(size = 4) +
+  geom_abline(slope = 1, intercept = 0) +
+  theme_bw() +
+  scale_x_continuous("R2017 (rank)") +
+  scale_y_continuous("R2018 (rank)")
+```
+
+Spearman's correlation (normalization  independent): `r CV_aggr %$% cor(R2017, R2018, method = "spearman") %>% round(2)`.
+
+
+## CV: Medians
 ```{r}
 group_by(CV_all, strain, date, replicate) %>% 
   summarise(value = median(value)) %>% 
@@ -201,26 +228,42 @@ group_by(CV_all, strain, date, replicate) %>%
   data.table
 ```
 
-## Spearman correlation test, grouped by strain
-```{r}
-group_by(CV_aggr, strain) %>%
-    summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
-    data.table()
-```
 
-## KOZA | species ~ medium comparison
+## VideoScan 24h
+
 ```{r}
 ggplot(VS_all, aes(x = date, y = value)) +
   geom_point() +
-  facet_grid(medium ~ strain)
+  facet_grid(medium ~ strain) + 
+  theme_bw()
+```
+
+## Correlation of the data {.columns-2}
+```{r}
+ggplot(VS_aggr, aes(x = R2017, y = R2018, color = strain)) +
+  geom_point(size = 4) +
+  facet_wrap(~ medium) +
+  theme_bw() 
+```
+
+```{r}
+group_by(VS_aggr, medium) %>% 
+   summarise(rho = cor(R2017, R2018, method = "pearson")) %>% 
+    knitr::kable()
 ```
 
 ## Correlation of the data
 ```{r}
-ggplot(VS_aggr, aes(x = R2016, y = R2018)) +
-  geom_point() +
-  facet_wrap(~ medium)
+group_by(VS_aggr, medium) %>% 
+  mutate(R2018 = rank(R2018), 
+         R2017 = rank(R2017)) %>% 
+  ggplot(aes(x = R2017, y = R2018, color = strain)) +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_point(size = 4) +
+  facet_wrap(~ medium) +
+  theme_bw() 
 ```
+
 
 ## Median of results grouped by strain
 ```{r}
@@ -232,12 +275,10 @@ group_by(VS_all, strain, date, replicate) %>%
 
 ## Spearman correlation test, grouped by medium and strain
 ```{r}
-group_by(VS_aggr, medium) %>% 
-   summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
-    data.table()
+
 
 group_by(VS_aggr, strain) %>% 
-   summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
+   summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
     data.table()
 ```
 
@@ -250,7 +291,7 @@ ggplot(VS_all1, aes(x = date, y = value)) +
 
 ## Correlation of the data
 ```{r}
-ggplot(VS_aggr1, aes(x = R2016, y = R2018)) +
+ggplot(VS_aggr1, aes(x = R2017, y = R2018)) +
   geom_point() +
   facet_wrap(~ medium)
 ```
@@ -267,11 +308,11 @@ group_by(VS_all1, strain, date, replicate) %>%
 ## Spearman correlation, grouped by medium  and strain
 ```{r}
 group_by(VS_aggr1, medium) %>% 
-    summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
+    summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
     data.table()
 
 group_by(VS_aggr1, strain) %>% 
-    summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
+    summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
     data.table()
 ```
 
