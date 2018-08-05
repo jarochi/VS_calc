@@ -14,11 +14,9 @@ library(reshape2)
 library(ggplot2)
 library(magrittr)
 library(data.table)
-<<<<<<< HEAD
 library(ggbeeswarm)
-=======
 library(grid)
->>>>>>> 8bce5069b5b56e29c1bd6d5135e7e8686697718f
+
 
 get_last_character <- function(x) {
   len_x <- nchar(x)
