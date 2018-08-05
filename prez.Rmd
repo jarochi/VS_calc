@@ -1,6 +1,9 @@
 ---
 title: "The first biofilm cultures"
 output: ioslides_presentation
+css: theme.css
+widescreen: true
+fullscreen: TRUE
 ---
 
 
@@ -11,7 +14,11 @@ library(reshape2)
 library(ggplot2)
 library(magrittr)
 library(data.table)
+<<<<<<< HEAD
 library(ggbeeswarm)
+=======
+library(grid)
+>>>>>>> 8bce5069b5b56e29c1bd6d5135e7e8686697718f
 
 get_last_character <- function(x) {
   len_x <- nchar(x)
@@ -203,6 +210,7 @@ ggplot(CV_aggr, aes(x = R2017, y = R2018, color = strain)) +
   theme_bw()
 ```
 
+
 Pearson's correlation: `r CV_aggr %$% cor(R2017, R2018, method = "pearson") %>% round(2)`.
 
 ## CV: correlation of median results
@@ -220,6 +228,7 @@ Spearman's correlation (normalization  independent): `r CV_aggr %$% cor(R2017, R
 
 
 ## CV: Medians
+
 ```{r}
 group_by(CV_all, strain, date, replicate) %>% 
   summarise(value = median(value)) %>% 
@@ -229,7 +238,16 @@ group_by(CV_all, strain, date, replicate) %>%
 ```
 
 
-## VideoScan 24h
+## Spearman correlation test, grouped by strain
+
+```{r}
+group_by(CV_aggr, strain) %>%
+    summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
+    data.table()
+```
+
+## KOZA | species ~ medium comparison
+
 
 ```{r}
 ggplot(VS_all, aes(x = date, y = value)) +
@@ -253,6 +271,7 @@ group_by(VS_aggr, medium) %>%
 ```
 
 ## Correlation of the data
+
 ```{r}
 group_by(VS_aggr, medium) %>% 
   mutate(R2018 = rank(R2018), 
@@ -266,6 +285,7 @@ group_by(VS_aggr, medium) %>%
 
 
 ## Median of results grouped by strain
+
 ```{r}
 group_by(VS_all, strain, date, replicate) %>% 
   summarise(value = median(value)) %>% 
@@ -274,6 +294,7 @@ group_by(VS_all, strain, date, replicate) %>%
 ```
 
 ## Spearman correlation test, grouped by medium and strain
+
 ```{r}
 
 
@@ -283,6 +304,7 @@ group_by(VS_aggr, strain) %>%
 ```
 
 ## ANIA | species ~ medium comparison
+
 ```{r}
 ggplot(VS_all1, aes(x = date, y = value)) +
   geom_point() +
@@ -290,6 +312,7 @@ ggplot(VS_all1, aes(x = date, y = value)) +
 ```
 
 ## Correlation of the data
+
 ```{r}
 ggplot(VS_aggr1, aes(x = R2017, y = R2018)) +
   geom_point() +
@@ -297,6 +320,7 @@ ggplot(VS_aggr1, aes(x = R2017, y = R2018)) +
 ```
 
 ## Median of results grouped by strain
+
 ```{r}
 group_by(VS_all1, strain, date, replicate) %>% 
   summarise(value = median(value)) %>% 
@@ -306,6 +330,7 @@ group_by(VS_all1, strain, date, replicate) %>%
 ```
 
 ## Spearman correlation, grouped by medium  and strain
+
 ```{r}
 group_by(VS_aggr1, medium) %>% 
     summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
@@ -317,6 +342,24 @@ group_by(VS_aggr1, strain) %>%
 ```
 
 ## Congo red assay and Calcofluor assay comparison
+
 ```{r}
 read.csv("data/wynik.csv")
 ```
+
+## Congo Red
+<!-- | girls vs Jule -->
+<!-- ![](data/CR1.jpg){ height=50% } -->
+<img class="fit" src="data/CR1.jpg"">
+<img class="fit" src="data/jule.jpg"">
+
+## Congo Red
+
+<img class="fit" src="data/CR2.jpg">
+<img class="fit" src="data/CR3.jpg">
+
+## CalcoFluor
+<!-- | girls vs Jule -->
+
+<img class="fit" src="data/CF1.jpg">
+<img class="fit" src="data/jule1.jpg">
