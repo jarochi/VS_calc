@@ -1,9 +1,9 @@
 ---
 title: "The first biofilm cultures"
-output: ioslides_presentation
+output: 
+  ioslides_presentation: 
+    widescreen: yes
 css: theme.css
-widescreen: true
-fullscreen: TRUE
 ---
 
 
@@ -211,7 +211,6 @@ ggplot(CV_aggr, aes(x = R2017, y = R2018, color = strain)) +
   theme_bw()
 ```
 
-
 Pearson's correlation: `r CV_aggr %$% cor(R2017, R2018, method = "pearson") %>% round(2)`.
 
 ## CV: Spearman's correlation
@@ -242,6 +241,7 @@ ggplot(VS_all, aes(x = date, y = value)) +
 
 Red points represent medians.
 
+<<<<<<< HEAD
 ## VS24: Pearson's correlation
 
 <style>
@@ -260,6 +260,27 @@ Red points represent medians.
 
 <div class="column-left">
 ```{r}
+=======
+## Spearman correlation test, grouped by strain
+
+```{r}
+group_by(CV_aggr, strain) %>%
+    summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
+    data.table()
+```
+
+## KOZA | species ~ medium comparison
+
+```{r}
+ggplot(VS_all, aes(x = date, y = value)) +
+  geom_point() +
+  facet_grid(medium ~ strain) + 
+  theme_bw()
+```
+
+## Correlation of the data {.columns-2}
+```{r fig.width=5.2}
+>>>>>>> e3d95375de7eae609bee463a83e83df0eb9e51c3
 ggplot(VS_aggr, aes(x = R2017, y = R2018, color = strain)) +
   geom_point(size = 4) +
   facet_wrap(~ medium) +
@@ -267,9 +288,13 @@ ggplot(VS_aggr, aes(x = R2017, y = R2018, color = strain)) +
 ```
 </div>
 
+<<<<<<< HEAD
 
 <div class="column-right">
 ```{r}
+=======
+```{r fig.width=1.5}
+>>>>>>> e3d95375de7eae609bee463a83e83df0eb9e51c3
 group_by(VS_aggr, medium) %>% 
   summarise(cor_coef = cor(R2017, R2018, method = "pearson")) %>% 
   mutate(cor_coef = round(cor_coef, 2)) %>% 
@@ -292,7 +317,12 @@ group_by(VS_aggr, medium) %>%
 ```
 </div>
 
+<<<<<<< HEAD
 <div class="column-right">
+=======
+## Median of results grouped by strain
+
+>>>>>>> e3d95375de7eae609bee463a83e83df0eb9e51c3
 ```{r}
 group_by(VS_aggr, medium) %>% 
   summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
@@ -301,6 +331,16 @@ group_by(VS_aggr, medium) %>%
 ```
 </div>
 
+<<<<<<< HEAD
+=======
+## Spearman correlation test, grouped by medium and strain
+
+```{r}
+group_by(VS_aggr, strain) %>% 
+   summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
+    data.table()
+```
+>>>>>>> e3d95375de7eae609bee463a83e83df0eb9e51c3
 
 ## ANIA | species ~ medium comparison
 
