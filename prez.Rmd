@@ -241,7 +241,6 @@ ggplot(VS_all, aes(x = date, y = value)) +
 
 Red points represent medians.
 
-<<<<<<< HEAD
 ## VS24: Pearson's correlation
 
 <style>
@@ -260,27 +259,6 @@ Red points represent medians.
 
 <div class="column-left">
 ```{r}
-=======
-## Spearman correlation test, grouped by strain
-
-```{r}
-group_by(CV_aggr, strain) %>%
-    summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
-    data.table()
-```
-
-## KOZA | species ~ medium comparison
-
-```{r}
-ggplot(VS_all, aes(x = date, y = value)) +
-  geom_point() +
-  facet_grid(medium ~ strain) + 
-  theme_bw()
-```
-
-## Correlation of the data {.columns-2}
-```{r fig.width=5.2}
->>>>>>> e3d95375de7eae609bee463a83e83df0eb9e51c3
 ggplot(VS_aggr, aes(x = R2017, y = R2018, color = strain)) +
   geom_point(size = 4) +
   facet_wrap(~ medium) +
@@ -288,13 +266,8 @@ ggplot(VS_aggr, aes(x = R2017, y = R2018, color = strain)) +
 ```
 </div>
 
-<<<<<<< HEAD
-
 <div class="column-right">
 ```{r}
-=======
-```{r fig.width=1.5}
->>>>>>> e3d95375de7eae609bee463a83e83df0eb9e51c3
 group_by(VS_aggr, medium) %>% 
   summarise(cor_coef = cor(R2017, R2018, method = "pearson")) %>% 
   mutate(cor_coef = round(cor_coef, 2)) %>% 
@@ -317,12 +290,8 @@ group_by(VS_aggr, medium) %>%
 ```
 </div>
 
-<<<<<<< HEAD
 <div class="column-right">
-=======
-## Median of results grouped by strain
 
->>>>>>> e3d95375de7eae609bee463a83e83df0eb9e51c3
 ```{r}
 group_by(VS_aggr, medium) %>% 
   summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
@@ -331,54 +300,79 @@ group_by(VS_aggr, medium) %>%
 ```
 </div>
 
-<<<<<<< HEAD
-=======
-## Spearman correlation test, grouped by medium and strain
+## VideoScan 48 hours
 
-```{r}
-group_by(VS_aggr, strain) %>% 
-   summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
-    data.table()
-```
->>>>>>> e3d95375de7eae609bee463a83e83df0eb9e51c3
-
-## ANIA | species ~ medium comparison
+Filename: **ProjektDevC003709-2018-07-27-Ania-Biofilm.csv**.
 
 ```{r}
 ggplot(VS_all1, aes(x = date, y = value)) +
-  geom_point() +
-  facet_grid(medium ~ strain)
+  geom_quasirandom() +
+  geom_point(data = group_by(VS_all, date, medium, strain) %>% summarize(median_val = median(value)),
+             aes(x = date, y = median_val), color = "red") +
+  facet_grid(medium ~ strain) +
+  theme_bw()
 ```
 
-## Correlation of the data
+Red points represent medians.
 
+## VS24: Pearson's correlation
+
+<style>
+.column-left{
+  float: left;
+  width: 60%;
+  text-align: left;
+}
+
+.column-right{
+  float: right;
+  width: 20%;
+  text-align: right;
+}
+</style>
+
+<div class="column-left">
 ```{r}
-ggplot(VS_aggr1, aes(x = R2017, y = R2018)) +
-  geom_point() +
-  facet_wrap(~ medium)
+ggplot(VS_aggr1, aes(x = R2017, y = R2018, color = strain)) +
+  geom_point(size = 4) +
+  facet_wrap(~ medium) +
+  theme_bw() 
 ```
+</div>
 
-## Median of results grouped by strain
-
+<div class="column-right">
 ```{r}
-group_by(VS_all1, strain, date, replicate) %>% 
-  summarise(value = median(value)) %>% 
-  summarise(value = median(value)) %>% 
-  dcast(strain ~ date) %>% 
-  kable()
+group_by(VS_aggr1, medium) %>% 
+  summarise(cor_coef = cor(R2017, R2018, method = "pearson")) %>% 
+  mutate(cor_coef = round(cor_coef, 2)) %>% 
+  kable(format = "html", table.attr = "float='left';style='width:30%;'")
 ```
+</div>
 
-## Spearman correlation, grouped by medium  and strain
+## VS: Spearman's correlation
+
+<div class="column-left">
+```{r}
+group_by(VS_aggr1, medium) %>% 
+  mutate(R2018 = rank(R2018), 
+         R2017 = rank(R2017)) %>% 
+  ggplot(aes(x = R2017, y = R2018, color = strain)) +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_point(size = 4) +
+  facet_wrap(~ medium) +
+  theme_bw() 
+```
+</div>
+
+<div class="column-right">
 
 ```{r}
 group_by(VS_aggr1, medium) %>% 
-    summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
-    kable()
-
-group_by(VS_aggr1, strain) %>% 
-    summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
-    kable()
+  summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
+  mutate(rho = round(rho, 2)) %>% 
+  kable(format = "html", table.attr = "float='left';style='width:30%;'")
 ```
+</div>
 
 ## Congo red assay and Calcofluor assay comparison
 
