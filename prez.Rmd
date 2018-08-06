@@ -1,9 +1,9 @@
 ---
 title: "The first biofilm cultures"
-output: ioslides_presentation
+output: 
+  ioslides_presentation: 
+    widescreen: yes
 css: theme.css
-widescreen: true
-fullscreen: TRUE
 ---
 
 
@@ -188,7 +188,7 @@ We compare results computing the correlation coefficient between results from Sc
 
 In the case of a perfect reproduction of an experiment, the correlation coefficient should be 1. If both experiments are giving different results, the correlation coefficient is 0.
 
-To account for normalization and baselining, we are using Spearman's correlation coefficient which relies on ranks instead of raw values.s
+To account for normalization and baselining, we are using Spearman's correlation coefficient which relies on ranks instead of raw values.
 
 ## Crystal Violet (CV)
 
@@ -207,7 +207,6 @@ ggplot(CV_aggr, aes(x = R2017, y = R2018, color = strain)) +
   #geom_smooth(method = "lm", color = "black", formula = y ~ x) +
   theme_bw()
 ```
-
 
 Pearson's correlation: `r CV_aggr %$% cor(R2017, R2018, method = "pearson") %>% round(2)`.
 
@@ -240,12 +239,11 @@ group_by(CV_all, strain, date, replicate) %>%
 
 ```{r}
 group_by(CV_aggr, strain) %>%
-    summarise(rho = cor(R2016, R2018, method = "spearman")) %>% 
+    summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
     data.table()
 ```
 
 ## KOZA | species ~ medium comparison
-
 
 ```{r}
 ggplot(VS_all, aes(x = date, y = value)) +
@@ -255,14 +253,14 @@ ggplot(VS_all, aes(x = date, y = value)) +
 ```
 
 ## Correlation of the data {.columns-2}
-```{r}
+```{r fig.width=5.2}
 ggplot(VS_aggr, aes(x = R2017, y = R2018, color = strain)) +
   geom_point(size = 4) +
   facet_wrap(~ medium) +
   theme_bw() 
 ```
 
-```{r}
+```{r fig.width=1.5}
 group_by(VS_aggr, medium) %>% 
    summarise(rho = cor(R2017, R2018, method = "pearson")) %>% 
     knitr::kable()
@@ -281,7 +279,6 @@ group_by(VS_aggr, medium) %>%
   theme_bw() 
 ```
 
-
 ## Median of results grouped by strain
 
 ```{r}
@@ -294,8 +291,6 @@ group_by(VS_all, strain, date, replicate) %>%
 ## Spearman correlation test, grouped by medium and strain
 
 ```{r}
-
-
 group_by(VS_aggr, strain) %>% 
    summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
     data.table()
