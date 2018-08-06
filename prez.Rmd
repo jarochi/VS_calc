@@ -364,7 +364,7 @@ group_by(VS_aggr_A, medium) %>%
 ```
 </div>
 
-## Congo red assay and calcofluor assay comparison
+## Congo red assay and calcofluor assay
 
 ```{r}
 read.csv("data/wynik.csv") %>% kable
