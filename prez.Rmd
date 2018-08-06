@@ -305,7 +305,7 @@ ggplot(VS_all_A, aes(x = date, y = value)) +
 
 Red points represent medians.
 
-## VS24: Pearson's correlation
+## VS48: Pearson's correlation
 
 <style>
 .column-left{
@@ -339,7 +339,7 @@ group_by(VS_aggr_A, medium) %>%
 ```
 </div>
 
-## VS: Spearman's correlation
+## VS48: Spearman's correlation
 
 <div class="column-left">
 ```{r}
@@ -364,25 +364,72 @@ group_by(VS_aggr_A, medium) %>%
 ```
 </div>
 
-## Congo red assay and Calcofluor assay comparison
+## Congo red assay and calcofluor assay comparison
 
 ```{r}
-read.csv("data/wynik.csv")
+read.csv("data/wynik.csv") %>% kable
 ```
 
 ## Congo Red
-<!-- | girls vs Jule -->
-<!-- ![](data/CR1.jpg){ height=50% } -->
+
+<style>
+.column-left1{
+  float: left;
+  width: 45%;
+  text-align: left;
+}
+
+.column-right1{
+  float: right;
+  width: 45%;
+  text-align: right;
+}
+</style>
+
+
+<div class="column-left1">
+R2018.
+<br>
 <img class="fit" src="data/CR1.jpg"">
+<br>
+Improper streaking.
+</div>
+
+<div class="column-right1">
+R2017
+<br>
 <img class="fit" src="data/jule.jpg"">
+</div>
+
 
 ## Congo Red
 
+<div class="column-left1">
 <img class="fit" src="data/CR2.jpg">
+</div>
+
+<div class="column-right1">
 <img class="fit" src="data/CR3.jpg">
+</div>
 
-## CalcoFluor
-<!-- | girls vs Jule -->
 
+
+## Calcofluor
+
+
+
+<div class="column-left1">
+R2018.
+<br>
 <img class="fit" src="data/CF1.jpg">
+<br>
+Improper streaking - too dense colonies.
+</div>
+
+<div class="column-right1">
+R2017
+<br>
 <img class="fit" src="data/jule1.jpg">
+</div>
+
+
