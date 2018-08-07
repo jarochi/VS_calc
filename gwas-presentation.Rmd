@@ -10,19 +10,34 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Increasing role of biofilm in human health
 
-Recent studies are reporting more and more way of biofilm (and biofilm-producing bacteria) affecting human health.
+Recent studies are reporting more and more way of biofilm (and biofilm-producing bacteria) affecting human health through the interaction of curli with human proteins.
 
-Chapman, lupus, Crohn disease, inflammatory bowel disease, colorectal cancer
+ - neurodegenerative diseases,
+ - systemic lupus erythematosus,
+ - inflammatory bowel disease, 
+ - colorectal cancer.
+
+## Increasing role of biofilm in human health
+
+Mapranosis (Friedland and Chapman, 2017): microbiota-associated proteopathy and neuroinflammation.
+
+Not all variants curli are causing proteopathy or rather specific variants of curli are causing proteopathy much faster.
 
 ## Development of biofilms
 
 Although general regulators of the biofilm biogenesis are known, there are still no large-scale studies associating phenotype (biofilm production) with genotype.
 
-Keio collction here
+Smith et al. (2017) evaluated Keio collection for regulation of biofilm formation.
+
+Major contributions: Ute Römling (still focused only on several strains).
 
 ## Available strains
 
-The collection of **Salmonella** ($n = 50$) and **Escherichia** ($n = 200$) strains is currently being sequenced proving an unique insight into genomic variability of **Enterobacteriaceae** (CHECK NAMES). 
+The collection of **Salmonella** ($n \approx 50$) and **Escherichia** ($n \approx 200$) strains is currently being sequenced proving an unique insight into genomic variability of **Enterobacteriaceae**.
 
+## Aim
 
-modulate immunity in protective or pathological manner
+Study:
+
+ - interaction of curli-producing bacteria (selected from the collection of strains using the computational model) with mapranosis-related cell lines,
+ - regulation of biofilm formation.
