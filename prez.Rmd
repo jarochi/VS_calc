@@ -366,9 +366,30 @@ group_by(VS_aggr_A, medium) %>%
 
 ## Congo red assay and calcofluor assay
 
-```{r}
-read.csv("data/wynik.csv") %>% kable
+```{r,warning=FALSE}
+cr_cf_dat <- read.csv("data/wynik.csv")
+
+cr <- select(cr_cf_dat, 1L:4) 
+colnames(cr) <- c("strain", "pathotype", "R2017", "R2018")
+
+cr_df <- mutate(cr, 
+       R2018 = substr(R2018, 0, 1)) %>% 
+       filter(R2018 != "" & R2017 != "") %>% 
+  select(-pathotype) %>% 
+  melt(id.vars = "strain") %>% 
+  mutate(value = factor(value, labels = c("bdar", "quality", "rdar", "smooth")),
+         value = relevel(value, "quality"))
+
+ggplot(cr_df, aes(x = strain, y = variable, fill = value)) +
+  geom_tile(color = "black") +
+  scale_x_discrete("Strain") +
+  scale_y_discrete("Date") +
+  scale_fill_discrete("Phenotype") +
+  theme_bw()
+
 ```
+
+Why there are no CR measurements for 5275 and 5276?
 
 ## Congo Red
 
