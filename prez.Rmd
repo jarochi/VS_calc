@@ -364,7 +364,7 @@ group_by(VS_aggr_A, medium) %>%
 ```
 </div>
 
-## Congo red assay and calcofluor assay
+## Congo red (CR)
 
 ```{r,warning=FALSE}
 cr_cf_dat <- read.csv("data/wynik.csv")
@@ -376,22 +376,35 @@ cr_df <- mutate(cr,
        R2018 = substr(R2018, 0, 1)) %>% 
        filter(R2018 != "" & R2017 != "") %>% 
   select(-pathotype) %>% 
-  melt(id.vars = "strain") %>% 
-  mutate(value = factor(value, labels = c("bdar", "quality", "rdar", "smooth")),
-         value = relevel(value, "quality"))
+  mutate(concordance = as.character(R2018) == as.character(R2017)) %>% 
+  melt(id.vars = c("strain", "concordance")) %>% 
+  mutate(value = factor(value, labels = c("bdar", "low quality", "rdar", "smooth")),
+         value = relevel(value, "low quality"))
 
-ggplot(cr_df, aes(x = strain, y = variable, fill = value)) +
+p <- ggplot(cr_df, aes(x = strain, y = variable, fill = value, shape = concordance)) +
   geom_tile(color = "black") +
+  geom_point(size = 4) +
   scale_x_discrete("Strain") +
-  scale_y_discrete("Date") +
+  scale_y_discrete("Measurement date") +
   scale_fill_discrete("Phenotype") +
+  scale_shape_manual("Concordance", values = c(NA, 16), guide = FALSE) +
   theme_bw()
 
+
+p
 ```
 
-Why there are no CR measurements for 5275 and 5276?
+Points denote experiments where results from 2017 and 2018 are in the agreement.
 
-## Congo Red
+## Congo red (CR)
+
+```{r,warning=FALSE}
+p
+```
+
+Why there are no CR measurements for strains 5275 and 5276?
+
+## CR (2017 and 2018)
 
 <style>
 .column-left1{
@@ -423,7 +436,7 @@ R2017
 </div>
 
 
-## Congo Red
+## CR2018
 
 <div class="column-left1">
 <img class="fit" src="data/CR2.jpg">
@@ -437,7 +450,32 @@ R2017
 
 ## Calcofluor
 
+```{r,warning=FALSE}
+cr_cf_dat <- read.csv("data/wynik.csv")
 
+cf <- select(cr_cf_dat, c(1, 5, 6)) 
+colnames(cf) <- c("strain", "R2017", "R2018")
+
+cf_df <- filter(cf, R2018 != "" & R2017 != "") %>%
+  mutate(concordance = as.character(R2018) == as.character(R2017)) %>% 
+  melt(id.vars = c("strain", "concordance")) %>% 
+  mutate(value = factor(value, labels = c("-", "+", "low quality")),
+         value = relevel(value, "low quality"))
+
+ggplot(cf_df, aes(x = strain, y = variable, fill = value, shape = concordance)) +
+  geom_tile(color = "black") +
+  geom_point(size = 4) +
+  scale_x_discrete("Strain") +
+  scale_y_discrete("Measurement date") +
+  scale_fill_discrete("Phenotype") +
+  scale_shape_manual("Concordance", values = c(NA, 16), guide = FALSE) +
+  theme_bw()
+
+```
+
+Points denote experiments where results from 2017 and 2018 are in the agreement.
+
+## Calcofluor 2017 and 2018
 
 <div class="column-left1">
 R2018.
@@ -453,4 +491,10 @@ R2017
 <img class="fit" src="data/jule1.jpg">
 </div>
 
+
+## Conclusions
+
+1. Repeat experiments (each person separately performs the whole procedure: three replicates of VS and CV and only once CR and CF).
+2. Improve quality of data: naming convention of files, put CV, CR and CF results in the electronic format in the dropbox repository.
+3. Improve quality of streaking and photos.
 
