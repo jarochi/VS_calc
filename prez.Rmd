@@ -187,7 +187,8 @@ ggplot(CV_all, aes(x = date, y = value)) +
   geom_point(data = group_by(CV_all, date, strain) %>% summarize(median_val = median(value)),
              aes(x = date, y = median_val), color = "red") +
   facet_wrap(~ strain) +
-  theme_bw()
+  theme_bw() + 
+  labs(y="Relative fluorescence", x="Measurement date")
 ```
 
 Red points represent medians.
@@ -198,7 +199,8 @@ Red points represent medians.
 ggplot(CV_aggr, aes(x = R2017, y = R2018, color = strain)) +
   geom_point(size = 4) +
   #geom_smooth(method = "lm", color = "black", formula = y ~ x) +
-  theme_bw()
+  theme_bw() +
+  labs(y="new results", x="Jule results")
 ```
 
 Pearson's correlation: `r CV_aggr %$% cor(R2017, R2018, method = "pearson") %>% round(2)`.
@@ -210,8 +212,9 @@ ggplot(CV_aggr, aes(x = rank(R2017), y = rank(R2018), color = strain)) +
   geom_point(size = 4) +
   geom_abline(slope = 1, intercept = 0) +
   theme_bw() +
-  scale_x_continuous("R2017 (rank)") +
-  scale_y_continuous("R2018 (rank)")
+  # scale_x_continuous("R2017 (rank)") +
+  # scale_y_continuous("R2018 (rank)")
+    labs(y="new results (rank)", x="Jule results (rank)")
 ```
 
 Spearman's correlation (normalization  independent): `r CV_aggr %$% cor(R2017, R2018, method = "spearman") %>% round(2)`.
@@ -226,7 +229,8 @@ ggplot(VS_all_K, aes(x = date, y = value)) +
   geom_point(data = group_by(VS_all_K, date, medium, strain) %>% summarize(median_val = median(value)),
              aes(x = date, y = median_val), color = "red") +
   facet_grid(medium ~ strain) +
-  theme_bw()
+  theme_bw() +
+  labs(y="Relative fluorescence", x="Measurement date")
 ```
 
 Red points represent medians.
@@ -252,7 +256,8 @@ Red points represent medians.
 ggplot(VS_aggr_K, aes(x = R2017, y = R2018, color = strain)) +
   geom_point(size = 4) +
   facet_wrap(~ medium) +
-  theme_bw() 
+  theme_bw() +
+  labs(y="new results", x="Jule results")
 ```
 </div>
 
@@ -276,7 +281,8 @@ group_by(VS_aggr_K, medium) %>%
   geom_abline(slope = 1, intercept = 0) +
   geom_point(size = 4) +
   facet_wrap(~ medium) +
-  theme_bw() 
+  theme_bw() +
+  labs(y="new results", x="Jule results")
 ```
 </div>
 
@@ -300,7 +306,8 @@ ggplot(VS_all_A, aes(x = date, y = value)) +
   geom_point(data = group_by(VS_all_A, date, medium, strain) %>% summarize(median_val = median(value)),
              aes(x = date, y = median_val), color = "red") +
   facet_grid(medium ~ strain) +
-  theme_bw()
+  theme_bw() +
+  labs(y="Relative fluorescence", x="Measurement date")
 ```
 
 Red points represent medians.
@@ -326,7 +333,8 @@ Red points represent medians.
 ggplot(VS_aggr_A, aes(x = R2017, y = R2018, color = strain)) +
   geom_point(size = 4) +
   facet_wrap(~ medium) +
-  theme_bw() 
+  theme_bw() +
+  labs(y="new results", x="Jule results")
 ```
 </div>
 
@@ -350,7 +358,8 @@ group_by(VS_aggr_A, medium) %>%
   geom_abline(slope = 1, intercept = 0) +
   geom_point(size = 4) +
   facet_wrap(~ medium) +
-  theme_bw() 
+  theme_bw() +
+  labs(y="new results", x="Jule results")
 ```
 </div>
 
@@ -491,6 +500,15 @@ R2017
 <img class="fit" src="data/jule1.jpg">
 </div>
 
+## CF2018
+
+<div class="column-left1">
+<img class="fit" src="data/CF2.jpg">
+</div>
+
+<div class="column-right1">
+<img class="fit" src="data/CF3.jpg">
+</div>
 
 ## Conclusions
 
