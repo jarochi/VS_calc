@@ -128,6 +128,7 @@ group_by(VS_aggr, medium) %>%
 
 
 ##############################
+library(tidyverse)
 # create data.frame with 2 col (CV, VS)
 aa <- list.files("./test")
 bb <- grep(pattern = ".ods", x = aa)
@@ -136,6 +137,7 @@ cc <- grep(pattern = ".csv", x = aa)
 xx1 <- cbind(aa[bb])
 xx1 <- cbind(xx1, as.numeric(order(xx1[, 1])))
 colnames(xx1) <- c("CV_filename", "order_nr")
+xx1 <- as.data.frame(xx1)
 
 xx2 <- cbind(aa[cc])
 
@@ -145,10 +147,12 @@ df <- t(df)
 
 xx2 <- cbind(xx2, df[,5])
 xx2 <- cbind(xx2, as.numeric(order(xx2[, 2])))
-colnames(xx2) <- c("CV_filename", "short_name", "order_nr")
+colnames(xx2) <- c("VS_filename", "short_name", "order_nr")
+xx2 <- as.data.frame(xx2)
 
 
-inner_join(xx1, xx2, by = c("order_nr" == "order_nr"))
+full_list <- inner_join(xx1, xx2, by = c("order_nr"))
+full_list <- full_list[, c(-2, -4)]
 
 # sort by grep cv filename and find vs
 
