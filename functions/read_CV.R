@@ -5,11 +5,11 @@ library(reshape2)
 # ith_file <- list.files("./CrystalViolet")
 # ith_file <- ith_file[1]
 
-read_cv <- function(cv_dir) {
+read_cv <- function(cv_dir, scheme_dir) {
   all_files <- list.files(cv_dir, full.names = TRUE)
   
   lapply(all_files, function(ith_file) {
-    cv_data <- read_ods(ith_file, col_names = FALSE) %>%
+    cv_data <- readODS::read_ods(ith_file, col_names = FALSE) %>%
     # cv_data <- read_ods("./CrystalViolet/2018-08-16-AL-S1-R1.ods", col_names = FALSE) %>%
       as.matrix
     
@@ -29,12 +29,14 @@ read_cv <- function(cv_dir) {
       unlist
     
     # experiment_date <- paste(experiment_metadata[1], experiment_metadata[2], experiment_metadata[3], sep = "-")
-##### check if works correctly on more templates    
-    scheme_name <- paste0("./CrystalViolet-scheme/", experiment_metadata[5], ".csv")
+    # TO DO: check if works correctly on more templates    
+    scheme_name <- paste0(scheme_dir, experiment_metadata[5], ".csv")
     
     plate_scheme <- read.csv(scheme_name, header = FALSE) %>% 
       as.matrix()
+    
     colnames(plate_scheme) <- LETTERS[1L:12]
+    
     mplate_scheme <- melt(plate_scheme, varnames = c("row", "col"), value.name = "description") %>% 
       mutate(row = factor(row), 
              col = factor(col))
@@ -54,26 +56,26 @@ read_cv <- function(cv_dir) {
     bind_rows()
 }
 
-res <- read_cv("./CrystalViolet")
-
-library(ggplot2)
-library(ggbeeswarm)
-
-ggplot(res, aes(x = strain, y = value, color = experimentator)) +
-  geom_boxplot() +
-  facet_wrap(~ medium) +
-  theme_bw()
-
-
-ggplot(res, aes(x = strain, y = value, color = experimentator)) +
-  geom_quasirandom() +
-  facet_wrap(~ medium) +
-  theme_bw()
-
-group_by(res, strain, medium, experimentator, replicate) %>% 
-  summarise(value = median(value)) %>% 
-  ggplot(aes(x = strain, y = value, color = experimentator)) +
-  geom_point(size = 3) +
-  facet_wrap(~ medium) +
-  theme_bw()
+# res <- read_cv("./CrystalViolet")
+# 
+# library(ggplot2)
+# library(ggbeeswarm)
+# 
+# ggplot(res, aes(x = strain, y = value, color = experimentator)) +
+#   geom_boxplot() +
+#   facet_wrap(~ medium) +
+#   theme_bw()
+# 
+# 
+# ggplot(res, aes(x = strain, y = value, color = experimentator)) +
+#   geom_quasirandom() +
+#   facet_wrap(~ medium) +
+#   theme_bw()
+# 
+# group_by(res, strain, medium, experimentator, replicate) %>% 
+#   summarise(value = median(value)) %>% 
+#   ggplot(aes(x = strain, y = value, color = experimentator)) +
+#   geom_point(size = 3) +
+#   facet_wrap(~ medium) +
+#   theme_bw()
 
