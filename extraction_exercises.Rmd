@@ -1,0 +1,386 @@
+---
+title: "Excercises on medium extraction on a 96-well plates"
+output: 
+  ioslides_presentation: 
+    widescreen: yes
+css: theme.css
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr)
+library(readODS)
+library(reshape2)
+library(ggplot2)
+library(ggbeeswarm)
+
+read_cv <- function(cv_dir) {
+  all_files <- list.files(cv_dir, full.names = TRUE)
+  
+  lapply(all_files, function(ith_file) {
+    cv_data <- read_ods(ith_file, col_names = FALSE) %>%
+      as.matrix
+    
+    colnames(cv_data) <- LETTERS[1L:12]
+    
+    mcv_data <- melt(cv_data, varnames = c("row", "col")) %>% 
+      mutate(row = factor(row), 
+             col = factor(col))
+    
+    experiment_metadata <- strsplit(ith_file, "/") %>% 
+      unlist %>% 
+      last %>% 
+      strsplit(".", fixed = TRUE) %>%
+      unlist %>% 
+      first %>% 
+      strsplit("_") %>% 
+      unlist
+##### check if works correctly on more templates    
+    scheme_name <- paste0("./CrystalViolet-scheme/", experiment_metadata[3], ".csv")
+    
+    plate_scheme <- read.csv(scheme_name, header = FALSE) %>% 
+      as.matrix()
+    colnames(plate_scheme) <- LETTERS[1L:12]
+    mplate_scheme <- melt(plate_scheme, varnames = c("row", "col"), value.name = "description") %>% 
+      mutate(row = factor(row), 
+             col = factor(col))
+    
+    
+    inner_join(mplate_scheme, mcv_data, by = c("row" = "row", "col" = "col")) %>% 
+      filter(!is.na(description)) %>% 
+      mutate(description = as.character(description), 
+             strain = sapply(strsplit(description, split = "-"), first),
+             medium = sapply(strsplit(description, split = "-"), last),
+             experimentator = experiment_metadata[2],
+             scheme = experiment_metadata[3],
+             replicate = experiment_metadata[4],
+             exp_date = experiment_metadata[1])  %>%
+      select(strain, medium, experimentator, replicate, value, exp_date)
+  }) %>%
+    bind_rows()
+}
+
+res <- read_cv("./CrystalViolet")
+```
+
+## Overview
+
+Created: 2018-08-04.
+
+Parsed: `r Sys.Date()`.
+
+## Aim 
+
+Repeat experiments from Schiebel et al. (2017).
+
+- Congo Red
+- Calcofluor
+- Crystal Violet
+- VideoScan
+
+## Materials
+
+Strains used: (poprawić)
+
+- E. coli MG 1655
+- 1917 Nissle (EcN)
+- 5212
+- 5270
+- 5271
+- 5272
+- 5275
+- 5276
+- 5644
+
+## Methods
+
+We compare results computing the correlation coefficient between results from Schiebel et al. (2017) and new measurements from 2018. Results are annotated as **R2017** and **R2018** respectively. 
+
+In the case of a perfect reproduction of an experiment, the correlation coefficient should be 1. If both experiments are giving different results, the correlation coefficient is 0.
+
+To account for normalization and baselining, we are using Spearman's correlation coefficient which relies on ranks instead of raw values.
+
+## Crystal Violet (CV)
+
+```{r}
+ggplot(res, aes(x = strain, y = value, color = experimentator)) +
+  geom_boxplot() +
+  facet_wrap(~ medium) +
+  theme_bw()
+```
+
+Red points represent medians.
+
+## Crystal Violet (CV) cd
+
+```{r}
+ggplot(res, aes(x = strain, y = value, color = experimentator)) +
+  geom_boxplot() +
+  facet_wrap(~ exp_date) +
+  theme_bw()
+```
+
+Red points represent medians.
+
+## CV: medium
+
+```{r}
+ggplot(res, aes(x = strain, y = value, color = experimentator)) +
+  geom_quasirandom() +
+  facet_wrap(~ medium) +
+  theme_bw()
+```
+
+## CV: exp_date
+
+```{r}
+ggplot(res, aes(x = strain, y = value, color = experimentator)) +
+  geom_quasirandom() +
+  facet_wrap(~ exp_date) +
+  theme_bw()
+```
+
+## CV: medium
+
+```{r}
+group_by(res, strain, medium, experimentator, replicate) %>% 
+  summarise(value = median(value)) %>% 
+  ggplot(aes(x = strain, y = value, color = experimentator)) +
+  geom_point(size = 3) +
+  facet_wrap(~ medium) +
+  theme_bw()
+```
+
+## CV: exp_date
+
+```{r}
+group_by(res, strain, medium, experimentator, replicate, exp_date) %>% 
+  summarise(value = median(value)) %>% 
+  ggplot(aes(x = strain, y = value, color = experimentator)) +
+  geom_point(size = 3) +
+  facet_wrap(~ exp_date) +
+  theme_bw()
+```
+
+## Congo red (CR)
+
+```{r,warning=FALSE}
+cr_cf_dat <- read.csv("data/wynik.csv")
+
+cr <- select(cr_cf_dat, 1L:4) 
+colnames(cr) <- c("strain", "pathotype", "R2017", "R2018")
+
+cr_df <- mutate(cr, 
+       R2018 = substr(R2018, 0, 1)) %>% 
+       filter(R2018 != "" & R2017 != "") %>% 
+  select(-pathotype) %>% 
+  mutate(concordance = as.character(R2018) == as.character(R2017)) %>% 
+  melt(id.vars = c("strain", "concordance")) %>% 
+  mutate(value = factor(value, labels = c("bdar", "low quality", "rdar", "smooth")),
+         value = relevel(value, "low quality"))
+
+p <- ggplot(cr_df, aes(x = strain, y = variable, fill = value, shape = concordance)) +
+  geom_tile(color = "black") +
+  geom_point(size = 4) +
+  scale_x_discrete("Strain") +
+  scale_y_discrete("Measurement date") +
+  scale_fill_discrete("Phenotype") +
+  scale_shape_manual("Concordance", values = c(NA, 16), guide = FALSE) +
+  theme_bw()
+
+
+p
+```
+
+Points denote experiments where results from 2017 and 2018 are in the agreement.
+
+## Congo red (CR)
+
+```{r,warning=FALSE}
+p
+```
+
+Why there are no CR measurements for strains 5275 and 5276?
+
+## CR (2017 and 2018)
+
+<style>
+.column-left1{
+  float: left;
+  width: 45%;
+  text-align: left;
+}
+
+.column-right1{
+  float: right;
+  width: 45%;
+  text-align: right;
+}
+</style>
+
+
+<div class="column-left1">
+R2018.
+<br>
+<img class="fit" src="data/CR1.jpg"">
+<br>
+Improper streaking.
+</div>
+
+<div class="column-right1">
+R2017
+<br>
+<img class="fit" src="data/jule.jpg"">
+</div>
+
+
+## CR2018
+
+<div class="column-left1">
+<img class="fit" src="data/CR2.jpg">
+</div>
+
+<div class="column-right1">
+<img class="fit" src="data/CR3.jpg">
+</div>
+
+
+
+## Calcofluor
+
+```{r,warning=FALSE}
+cr_cf_dat <- read.csv("data/wynik.csv")
+
+cf <- select(cr_cf_dat, c(1, 5, 6)) 
+colnames(cf) <- c("strain", "R2017", "R2018")
+
+cf_df <- filter(cf, R2018 != "" & R2017 != "") %>%
+  mutate(concordance = as.character(R2018) == as.character(R2017)) %>% 
+  melt(id.vars = c("strain", "concordance")) %>% 
+  mutate(value = factor(value, labels = c("-", "+", "low quality")),
+         value = relevel(value, "low quality"))
+
+ggplot(cf_df, aes(x = strain, y = variable, fill = value, shape = concordance)) +
+  geom_tile(color = "black") +
+  geom_point(size = 4) +
+  scale_x_discrete("Strain") +
+  scale_y_discrete("Measurement date") +
+  scale_fill_discrete("Phenotype") +
+  scale_shape_manual("Concordance", values = c(NA, 16), guide = FALSE) +
+  theme_bw()
+
+```
+
+Points denote experiments where results from 2017 and 2018 are in the agreement.
+
+## Calcofluor 2017 and 2018
+
+<div class="column-left1">
+R2018.
+<br>
+<img class="fit" src="data/CF1.jpg">
+<br>
+Improper streaking - too dense colonies.
+</div>
+
+<div class="column-right1">
+R2017
+<br>
+<img class="fit" src="data/jule1.jpg">
+</div>
+
+## CF2018
+
+<div class="column-left1">
+<img class="fit" src="data/CF2.jpg">
+</div>
+
+<div class="column-right1">
+<img class="fit" src="data/CF3.jpg">
+</div>
+
+## Conclusions
+
+1. Repeat experiments (each person separately performs the whole procedure: three replicates of VS and CV and only once CR and CF).
+2. Improve quality of data: naming convention of files, put CV, CR and CF results in the electronic format in the dropbox repository.
+3. Improve quality of streaking and photos.
+
+
+## VideoScan 24 hours - 4, column swap
+
+Filename: **ProjektDevC003707-2018-07-26-Koza-Biofilm.csv**.
+
+```{r}
+ggplot(VS_all_K_1, aes(x = date, y = value)) +
+  geom_quasirandom() +
+  geom_point(data = group_by(VS_all_K_1, date, medium, strain) %>% summarize(median_val = median(value)),
+             aes(x = date, y = median_val), color = "red") +
+  facet_grid(medium ~ strain) +
+  theme_bw() +
+  labs(y="Relative fluorescence", x="Measurement date")
+```
+
+Red points represent medians.
+
+## VS24: Pearson's correlation - 4, column swap
+
+<style>
+.column-left{
+  float: left;
+  width: 60%;
+  text-align: left;
+}
+
+.column-right{
+  float: right;
+  width: 20%;
+  text-align: right;
+}
+</style>
+
+<div class="column-left">
+```{r}
+ggplot(VS_aggr_K_1, aes(x = R2017, y = R2018, color = strain)) +
+  geom_point(size = 4) +
+  facet_wrap(~ medium) +
+  theme_bw() +
+  labs(y="new results", x="Jule results")
+```
+</div>
+
+<div class="column-right">
+```{r}
+group_by(VS_aggr_K_1, medium) %>% 
+  summarise(cor_coef = cor(R2017, R2018, method = "pearson")) %>% 
+  mutate(cor_coef = round(cor_coef, 2)) %>% 
+  kable(format = "html", table.attr = "float='left';style='width:30%;'")
+```
+</div>
+
+## VS24: Spearman's correlation - 4, column swap
+
+<div class="column-left">
+```{r}
+group_by(VS_aggr_K_1, medium) %>% 
+  mutate(R2018 = rank(R2018), 
+         R2017 = rank(R2017)) %>% 
+  ggplot(aes(x = R2017, y = R2018, color = strain)) +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_point(size = 4) +
+  facet_wrap(~ medium) +
+  theme_bw() +
+  labs(y="new results", x="Jule results")
+```
+</div>
+
+<div class="column-right">
+
+```{r}
+group_by(VS_aggr_K_1, medium) %>% 
+  summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
+  mutate(rho = round(rho, 2)) %>% 
+  kable(format = "html", table.attr = "float='left';style='width:30%;'")
+```
+</div>
+
