@@ -132,7 +132,23 @@ group_by(VS_aggr, medium) %>%
 aa <- list.files("./test")
 bb <- grep(pattern = ".ods", x = aa)
 cc <- grep(pattern = ".csv", x = aa)
-xx <- cbind(aa[bb], aa[cc])
+# xx <- cbind(aa[bb], aa[cc])
+xx1 <- cbind(aa[bb])
+xx1 <- cbind(xx1, as.numeric(order(xx1[, 1])))
+colnames(xx1) <- c("CV_filename", "order_nr")
+
+xx2 <- cbind(aa[cc])
+
+ll <- str_split(xx2[, 1], "-")
+df <- data.frame(matrix(unlist(ll), nrow = 6))
+df <- t(df)
+
+xx2 <- cbind(xx2, df[,5])
+xx2 <- cbind(xx2, as.numeric(order(xx2[, 2])))
+colnames(xx2) <- c("CV_filename", "short_name", "order_nr")
+
+
+inner_join(xx1, xx2, by = c("order_nr" == "order_nr"))
 
 # sort by grep cv filename and find vs
 
