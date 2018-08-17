@@ -2,15 +2,15 @@ library(dplyr)
 library(readODS)
 library(reshape2)
 
-ith_file <- list.files("./CrystalViolet")
-ith_file <- ith_file[1]
+# ith_file <- list.files("./CrystalViolet")
+# ith_file <- ith_file[1]
 
 read_cv <- function(cv_dir) {
   all_files <- list.files(cv_dir, full.names = TRUE)
   
   lapply(all_files, function(ith_file) {
     cv_data <- read_ods(ith_file, col_names = FALSE) %>%
-    # cv_data <- read_ods("./CrystalViolet/2018-08-16_AL_S1_R1.ods", col_names = FALSE) %>%
+    # cv_data <- read_ods("./CrystalViolet/2018-08-16-AL-S1-R1.ods", col_names = FALSE) %>%
       as.matrix
     
     colnames(cv_data) <- LETTERS[1L:12]
@@ -25,10 +25,12 @@ read_cv <- function(cv_dir) {
       strsplit(".", fixed = TRUE) %>%
       unlist %>% 
       first %>% 
-      strsplit("_") %>% 
+      strsplit("-") %>% 
       unlist
+    
+    # experiment_date <- paste(experiment_metadata[1], experiment_metadata[2], experiment_metadata[3], sep = "-")
 ##### check if works correctly on more templates    
-    scheme_name <- paste0("./CrystalViolet-scheme/", experiment_metadata[3], ".csv")
+    scheme_name <- paste0("./CrystalViolet-scheme/", experiment_metadata[5], ".csv")
     
     plate_scheme <- read.csv(scheme_name, header = FALSE) %>% 
       as.matrix()
@@ -43,10 +45,10 @@ read_cv <- function(cv_dir) {
       mutate(description = as.character(description), 
              strain = sapply(strsplit(description, split = "-"), first),
              medium = sapply(strsplit(description, split = "-"), last),
-             experimentator = experiment_metadata[2],
-             scheme = experiment_metadata[3],
-             replicate = experiment_metadata[4],
-             exp_date = experiment_metadata[1])  %>%
+             experimentator = experiment_metadata[4],
+             scheme = experiment_metadata[4],
+             replicate = experiment_metadata[6],
+             exp_date = paste(experiment_metadata[1], experiment_metadata[2], experiment_metadata[3], sep = "-"))  %>%
       select(strain, medium, experimentator, replicate, value, exp_date)
   }) %>%
     bind_rows()
