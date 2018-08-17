@@ -17,7 +17,7 @@ library(ggbeeswarm)
 
 source("./functions/read_CV.R")
 
-res <- read_cv("./CrystalViolet")
+res <- read_cv("./CrystalViolet", "./CrystalViolet-scheme/")
 ```
 
 ## Overview
