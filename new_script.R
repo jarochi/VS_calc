@@ -118,3 +118,29 @@ ggplot(VS_aggr, aes(x = R2016, y = R2018)) +
 
 group_by(VS_aggr, medium) %>% 
   summarise(rho = cor(R2016, R2018, method = "spearman"))
+
+
+
+
+
+
+
+
+
+##############################
+# create data.frame with 2 col (CV, VS)
+aa <- list.files("./test")
+bb <- grep(pattern = ".ods", x = aa)
+cc <- grep(pattern = ".csv", x = aa)
+xx <- cbind(aa[bb], aa[cc])
+
+# sort by grep cv filename and find vs
+
+
+
+
+
+
+
+
+
