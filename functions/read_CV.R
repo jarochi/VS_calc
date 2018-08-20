@@ -56,26 +56,26 @@ read_cv <- function(cv_dir, scheme_dir) {
     bind_rows()
 }
 
-# res <- read_cv("./CrystalViolet")
-# 
-# library(ggplot2)
-# library(ggbeeswarm)
-# 
-# ggplot(res, aes(x = strain, y = value, color = experimentator)) +
-#   geom_boxplot() +
-#   facet_wrap(~ medium) +
-#   theme_bw()
-# 
-# 
-# ggplot(res, aes(x = strain, y = value, color = experimentator)) +
-#   geom_quasirandom() +
-#   facet_wrap(~ medium) +
-#   theme_bw()
-# 
-# group_by(res, strain, medium, experimentator, replicate) %>% 
-#   summarise(value = median(value)) %>% 
-#   ggplot(aes(x = strain, y = value, color = experimentator)) +
-#   geom_point(size = 3) +
-#   facet_wrap(~ medium) +
-#   theme_bw()
+res <- read_cv("./CrystalViolet", scheme_dir = "CrystalViolet-scheme/")
+
+library(ggplot2)
+library(ggbeeswarm)
+
+ggplot(res, aes(x = strain, y = value, color = experimentator)) +
+  geom_boxplot() +
+  facet_wrap(~ medium) +
+  theme_bw()
+
+
+ggplot(res, aes(x = strain, y = value, color = experimentator)) +
+  geom_quasirandom() +
+  facet_wrap(~ medium) +
+  theme_bw()
+
+group_by(res, strain, medium, experimentator, replicate) %>%
+  summarise(value = median(value)) %>%
+  ggplot(aes(x = strain, y = value, color = experimentator)) +
+  geom_point(size = 3) +
+  facet_wrap(~ medium) +
+  theme_bw()
 
