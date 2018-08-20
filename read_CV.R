@@ -29,6 +29,7 @@ read_cv <- function(cv_dir) {
       unlist
     
     # experiment_date <- paste(experiment_metadata[1], experiment_metadata[2], experiment_metadata[3], sep = "-")
+    
 ##### check if works correctly on more templates    
     scheme_name <- paste0("./CrystalViolet-scheme/", experiment_metadata[5], ".csv")
     
@@ -61,7 +62,8 @@ library(ggbeeswarm)
 
 ggplot(res, aes(x = strain, y = value, color = experimentator)) +
   geom_boxplot() +
-  facet_wrap(~ medium) +
+  # facet_wrap(~ exp_date) +
+  facet_grid(cols = vars(medium), rows = vars(exp_date)) +
   theme_bw()
 
 
