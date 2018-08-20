@@ -14,8 +14,10 @@ library(readODS)
 library(reshape2)
 library(ggplot2)
 library(ggbeeswarm)
+library(tidyverse)
 
 source("./functions/read_CV.R")
+
 
 res <- read_cv("./CrystalViolet", "./CrystalViolet-scheme/")
 ```
@@ -30,24 +32,24 @@ Parsed: `r Sys.Date()`.
 
 Repeat experiments from Schiebel et al. (2017).
 
-- Congo Red
-- Calcofluor
 - Crystal Violet
 - VideoScan
 
+Learn how to extract medium solution in order to lose as few bacteria as possible.
+Developing a reproducible extraction method.
+
 ## Materials
 
-Strains used: (poprawić)
+Strains used:
 
-- E. coli MG 1655
-- 1917 Nissle (EcN)
-- 5212
 - 5270
 - 5271
 - 5272
 - 5275
 - 5276
-- 5644
+
+The selected strains were used because they formed the strongest biofilms. 
+In addition, we had a comparison with the figures from the publication.
 
 ## Methods
 
@@ -68,18 +70,18 @@ ggplot(res, aes(x = strain, y = value, color = experimentator)) +
 
 Red points represent medians.
 
-## Crystal Violet (CV) cd
+## Crystal Violet (CV). Result by day.
 
 ```{r}
 ggplot(res, aes(x = strain, y = value, color = experimentator)) +
   geom_boxplot() +
-  facet_wrap(~ exp_date) +
+  facet_grid(cols = vars(medium), rows = vars(exp_date)) +
   theme_bw()
 ```
 
 Red points represent medians.
 
-## CV: medium
+## CV: medium. Quasirandom.
 
 ```{r}
 ggplot(res, aes(x = strain, y = value, color = experimentator)) +
@@ -88,16 +90,16 @@ ggplot(res, aes(x = strain, y = value, color = experimentator)) +
   theme_bw()
 ```
 
-## CV: exp_date
+## CV: medium. Result by day. Quasirandom.
 
 ```{r}
 ggplot(res, aes(x = strain, y = value, color = experimentator)) +
   geom_quasirandom() +
-  facet_wrap(~ exp_date) +
+  facet_grid(cols = vars(medium), rows = vars(exp_date)) +
   theme_bw()
 ```
 
-## CV: medium
+## CV: median.
 
 ```{r}
 group_by(res, strain, medium, experimentator, replicate) %>% 
@@ -108,35 +110,38 @@ group_by(res, strain, medium, experimentator, replicate) %>%
   theme_bw()
 ```
 
-## CV: exp_date
+## CV: median. Result by day.
 
 ```{r}
 group_by(res, strain, medium, experimentator, replicate, exp_date) %>% 
   summarise(value = median(value)) %>% 
   ggplot(aes(x = strain, y = value, color = experimentator)) +
   geom_point(size = 3) +
-  facet_wrap(~ exp_date) +
+  facet_grid(cols = vars(medium), rows = vars(exp_date)) +
   theme_bw()
 ```
 
 ## Congo red (CR)
 
 ```{r,warning=FALSE}
-cr_cf_dat <- read.csv("data/wynik.csv")
+cr_cf_dat <- read.csv("data/2018-08-17_CR_CF_format.csv", na.strings = TRUE)
 
-cr <- select(cr_cf_dat, 1L:4) 
-colnames(cr) <- c("strain", "pathotype", "R2017", "R2018")
+cr <- select(cr_cf_dat, 1L:6) 
+colnames(cr) <- c("strain", "pathotype", "Ania", "Dominika", "Joanna", "Jule")
+cr <- select(cr, -pathotype)
 
-cr_df <- mutate(cr, 
-       R2018 = substr(R2018, 0, 1)) %>% 
-       filter(R2018 != "" & R2017 != "") %>% 
-  select(-pathotype) %>% 
-  mutate(concordance = as.character(R2018) == as.character(R2017)) %>% 
-  melt(id.vars = c("strain", "concordance")) %>% 
-  mutate(value = factor(value, labels = c("bdar", "low quality", "rdar", "smooth")),
-         value = relevel(value, "low quality"))
+cr_df <- cr %>% 
+  # gather(key = "strain", value = c(Ania, Dominika, Joanna, Jule))
+  # filter(Ania != "", Dominika != "", Joanna != "", Jule != "") %>% 
+  select(Ania, Dominika, Joanna, Jule) %>% gather(key = "experimentator", value = "phenotype") %>% 
+  cbind(cr) %>% 
+  select(-Ania, -Dominika, -Joanna) %>% 
+  mutate(concordance = as.character(phenotype) == as.character(Jule)) %>% 
+  mutate(phenotype = factor(phenotype))
 
-p <- ggplot(cr_df, aes(x = strain, y = variable, fill = value, shape = concordance)) +
+
+# Popracować nad wykresem
+p <- ggplot(cr_df, aes(x = strain, y = experimentator, fill = phenotype, shape = concordance)) +
   geom_tile(color = "black") +
   geom_point(size = 4) +
   scale_x_discrete("Strain") +
@@ -151,11 +156,11 @@ p
 
 Points denote experiments where results from 2017 and 2018 are in the agreement.
 
-## Congo red (CR)
+<!-- ## Congo red (CR) -->
 
-```{r,warning=FALSE}
-p
-```
+<!-- ```{r,warning=FALSE} -->
+<!-- p -->
+<!-- ``` -->
 
 Why there are no CR measurements for strains 5275 and 5276?
 
@@ -179,7 +184,7 @@ Why there are no CR measurements for strains 5275 and 5276?
 <div class="column-left1">
 R2018.
 <br>
-<img class="fit" src="data/CR1.jpg"">
+<img class="fit" src="data/CR_CF_plates_17-08-2018/kontrola1_17.08.jpg"">
 <br>
 Improper streaking.
 </div>
@@ -187,37 +192,50 @@ Improper streaking.
 <div class="column-right1">
 R2017
 <br>
-<img class="fit" src="data/jule.jpg"">
+<img class="fit" src="data/CR_CF_plates_17-08-2018/kontrola2_17.08.jpg"">
 </div>
 
 
 ## CR2018
 
 <div class="column-left1">
-<img class="fit" src="data/CR2.jpg">
+<img class="fit" src="data/CR_CF_plates_17-08-2018/kontrola3_17.08.jpg">
 </div>
 
 <div class="column-right1">
-<img class="fit" src="data/CR3.jpg">
+<img class="fit" src="data/CR_CF_plates_17-08-2018/próba1_17.08.jpg">
 </div>
 
+## CR2018
+
+<div class="column-left1">
+<img class="fit" src="data/CR_CF_plates_17-08-2018/próba2_17.08.jpg">
+</div>
+
+<div class="column-right1">
+<img class="fit" src="data/CR_CF_plates_17-08-2018/próba3_17.08.jpg">
+</div>
 
 
 ## Calcofluor
 
 ```{r,warning=FALSE}
-cr_cf_dat <- read.csv("data/wynik.csv")
+cr_cf_dat <- read.csv("data/2018-08-17_CR_CF_format.csv")
 
-cf <- select(cr_cf_dat, c(1, 5, 6)) 
-colnames(cf) <- c("strain", "R2017", "R2018")
+cf <- select(cr_cf_dat, c(1, 7:10))
+colnames(cf) <- c("strain", "Ania", "Dominika", "Joanna", "Jule")
 
-cf_df <- filter(cf, R2018 != "" & R2017 != "") %>%
-  mutate(concordance = as.character(R2018) == as.character(R2017)) %>% 
-  melt(id.vars = c("strain", "concordance")) %>% 
-  mutate(value = factor(value, labels = c("-", "+", "low quality")),
-         value = relevel(value, "low quality"))
+cf_df <- cf %>% 
+  # gather(key = "strain", value = c(Ania, Dominika, Joanna, Jule))
+  # filter(Ania != "", Dominika != "", Joanna != "", Jule != "") %>% 
+  select(Ania, Dominika, Joanna, Jule) %>% 
+  gather(key = "experimentator", value = "result") %>% 
+  cbind(cf) %>% 
+  select(-Ania, -Dominika, -Joanna) %>% 
+  mutate(concordance = as.character(result) == as.character(Jule)) %>% 
+  mutate(result = factor(result))
 
-ggplot(cf_df, aes(x = strain, y = variable, fill = value, shape = concordance)) +
+ggplot(cf_df, aes(x = strain, y = experimentator, fill = result, shape = concordance)) +
   geom_tile(color = "black") +
   geom_point(size = 4) +
   scale_x_discrete("Strain") +
@@ -235,108 +253,27 @@ Points denote experiments where results from 2017 and 2018 are in the agreement.
 <div class="column-left1">
 R2018.
 <br>
-<img class="fit" src="data/CF1.jpg">
-<br>
-Improper streaking - too dense colonies.
+<img class="fit" src="data/CR_CF_plates_17-08-2018/ania_17.08.jpg">
 </div>
 
 <div class="column-right1">
 R2017
 <br>
-<img class="fit" src="data/jule1.jpg">
+<img class="fit" src="data/CR_CF_plates_17-08-2018/asia_17.08.jpg">
 </div>
 
 ## CF2018
 
 <div class="column-left1">
-<img class="fit" src="data/CF2.jpg">
+<img class="fit" src="data/CR_CF_plates_17-08-2018/koza_17.08.jpg">
 </div>
 
-<div class="column-right1">
-<img class="fit" src="data/CF3.jpg">
-</div>
+<!-- <div class="column-right1"> -->
+<!-- <img class="fit" src="data/CR_CF_plates_17-08-2018/CF3.jpg"> -->
+<!-- </div> -->
 
 ## Conclusions
 
 1. Repeat experiments (each person separately performs the whole procedure: three replicates of VS and CV and only once CR and CF).
 2. Improve quality of data: naming convention of files, put CV, CR and CF results in the electronic format in the dropbox repository.
 3. Improve quality of streaking and photos.
-
-
-## VideoScan 24 hours - 4, column swap
-
-Filename: **ProjektDevC003707-2018-07-26-Koza-Biofilm.csv**.
-
-```{r}
-ggplot(VS_all_K_1, aes(x = date, y = value)) +
-  geom_quasirandom() +
-  geom_point(data = group_by(VS_all_K_1, date, medium, strain) %>% summarize(median_val = median(value)),
-             aes(x = date, y = median_val), color = "red") +
-  facet_grid(medium ~ strain) +
-  theme_bw() +
-  labs(y="Relative fluorescence", x="Measurement date")
-```
-
-Red points represent medians.
-
-## VS24: Pearson's correlation - 4, column swap
-
-<style>
-.column-left{
-  float: left;
-  width: 60%;
-  text-align: left;
-}
-
-.column-right{
-  float: right;
-  width: 20%;
-  text-align: right;
-}
-</style>
-
-<div class="column-left">
-```{r}
-ggplot(VS_aggr_K_1, aes(x = R2017, y = R2018, color = strain)) +
-  geom_point(size = 4) +
-  facet_wrap(~ medium) +
-  theme_bw() +
-  labs(y="new results", x="Jule results")
-```
-</div>
-
-<div class="column-right">
-```{r}
-group_by(VS_aggr_K_1, medium) %>% 
-  summarise(cor_coef = cor(R2017, R2018, method = "pearson")) %>% 
-  mutate(cor_coef = round(cor_coef, 2)) %>% 
-  kable(format = "html", table.attr = "float='left';style='width:30%;'")
-```
-</div>
-
-## VS24: Spearman's correlation - 4, column swap
-
-<div class="column-left">
-```{r}
-group_by(VS_aggr_K_1, medium) %>% 
-  mutate(R2018 = rank(R2018), 
-         R2017 = rank(R2017)) %>% 
-  ggplot(aes(x = R2017, y = R2018, color = strain)) +
-  geom_abline(slope = 1, intercept = 0) +
-  geom_point(size = 4) +
-  facet_wrap(~ medium) +
-  theme_bw() +
-  labs(y="new results", x="Jule results")
-```
-</div>
-
-<div class="column-right">
-
-```{r}
-group_by(VS_aggr_K_1, medium) %>% 
-  summarise(rho = cor(R2017, R2018, method = "spearman")) %>% 
-  mutate(rho = round(rho, 2)) %>% 
-  kable(format = "html", table.attr = "float='left';style='width:30%;'")
-```
-</div>
-
