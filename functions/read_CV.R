@@ -73,10 +73,17 @@ read_cv <- function(cv_dir, scheme_dir) {
 #   facet_wrap(~ medium) +
 #   theme_bw()
 # 
-# group_by(res, strain, medium, experimentator, replicate) %>% 
-#   summarise(value = median(value)) %>% 
+# group_by(res, strain, medium, experimentator, replicate) %>%
+#   summarise(value = median(value)) %>%
+#   summarise(value = median(value)) %>%
 #   ggplot(aes(x = strain, y = value, color = experimentator)) +
 #   geom_point(size = 3) +
 #   facet_wrap(~ medium) +
 #   theme_bw()
-
+# 
+# group_by(res, strain, medium, experimentator, replicate) %>%
+#   mutate(value = value/max(value)) %>% 
+#   ggplot(aes(x = strain, y = value, color = experimentator)) +
+#   geom_quasirandom() +
+#   facet_wrap(~ medium) +
+#   theme_bw()
