@@ -8,19 +8,46 @@ css: theme.css
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, fig.width = 5)
+library(knitr)
 library(dplyr)
 library(readODS)
 library(reshape2)
 library(ggplot2)
 library(ggbeeswarm)
+library(broom)
+
+opts_chunk$set(echo = FALSE, fig.width = 9.5)
 
 source("./functions/read_CV.R")
 
 
-res <- read_cv("./CrystalViolet", "./CrystalViolet-scheme/")
+cv2018 <- read_cv("./CrystalViolet", "./CrystalViolet-scheme/")
 
-no_neg_res <- filter(res, medium != "NEG")
+no_neg_cv2018 <- filter(cv2018, medium != "NEG")
+
+get_last_character <- function(x) {
+  len_x <- nchar(x)
+  substr(x, len_x, len_x)
+}
+
+cv2017 <- read.csv2("data/cv_and_videoscan.csv") %>% 
+  mutate(strain = factor(strain)) %>% 
+  melt(variable.name = "experiment") %>% 
+  mutate(method = ifelse(grepl("CV", experiment), "CV", "Videoscan"),
+         replicate = paste0("R", get_last_character(as.character(experiment))),
+         medium = substr(experiment, 0, 3)) %>% 
+  filter(method == "CV") %>% 
+  mutate(experimentator = "JuS",
+         medium = "LB",
+         exp_date = "2017") %>% 
+  select(strain, medium, experimentator, replicate, value, exp_date) %>% 
+  filter(strain %in% unique(cv2018[["strain"]]))
+  
+
+both_measurements <- bind_rows(no_neg_cv2018, cv2017) %>% 
+  filter(medium == "LB") 
+
+
 ```
 
 ## Overview
@@ -62,7 +89,7 @@ To account for normalization and baselining, we are using Spearman's correlation
 ## Crystal Violet (CV)
 
 ```{r}
-ggplot(no_neg_res, aes(x = strain, y = value, color = experimentator)) +
+ggplot(no_neg_cv2018, aes(x = strain, y = value, color = experimentator)) +
   geom_boxplot() +
   facet_wrap(~ medium) +
   theme_bw()
@@ -72,8 +99,76 @@ ggplot(no_neg_res, aes(x = strain, y = value, color = experimentator)) +
 ## Crystal Violet (CV)
 
 ```{r}
-ggplot(no_neg_res, aes(x = strain, y = value, color = experimentator)) +
+ggplot(no_neg_cv2018, aes(x = strain, y = value, color = experimentator)) +
   geom_quasirandom() +
   facet_wrap(~ medium) +
   theme_bw()
+```
+
+
+## Crystal Violet (CV)
+
+```{r}
+ggplot(both_measurements, aes(x = experimentator, y = value)) +
+  geom_boxplot() +
+  facet_wrap(~ strain) +
+  theme_bw()
+```
+
+JuS: Jule Schiebel
+
+## Crystal Violet (CV)
+
+```{r}
+ggplot(both_measurements, aes(x = experimentator, y = value)) +
+  geom_quasirandom() +
+  facet_wrap(~ strain) +
+  theme_bw()
+```
+
+JuS: Jule Schiebel
+
+## CV: medians
+
+```{r}
+agg_cv <- group_by(both_measurements, strain, experimentator, replicate) %>% 
+  summarise(value = median(value)) %>% 
+  summarise(value = median(value)) %>% 
+  group_by(experimentator) %>% 
+  mutate(value_rank = rank(value))
+
+ggplot(agg_cv, aes(x = experimentator, y = value)) +
+  geom_point() +
+  facet_wrap(~ strain) +
+  theme_bw()
+```
+
+JuS: Jule Schiebel
+
+## CV: correlations
+
+```{r}
+ 
+cor_cv <- filter(agg_cv, experimentator == "JuS") %>% 
+  ungroup() %>% 
+  select(strain, proper_rank = value_rank, proper_value = value) %>% 
+  inner_join(agg_cv, by = c("strain" = "strain")) %>% 
+  filter(experimentator != "JuS") 
+
+ggplot(cor_cv, aes(x = value_rank, y = proper_rank, color = strain)) +
+  geom_point(size = 4) +
+  geom_abline(slope = 1, intercept = 0) +
+  facet_wrap(~ experimentator) +
+  theme_bw()
+
+```
+
+## CV: correlations
+
+```{r}
+ 
+group_by(cor_cv, experimentator) %>% 
+  do(tidy(cor.test(.[["proper_rank"]], .[["value_rank"]], method = "spearman"))) %>% 
+  kable
+
 ```
