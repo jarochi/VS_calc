@@ -82,7 +82,7 @@ read_cv <- function(cv_dir, scheme_dir) {
 #   theme_bw()
 # 
 # group_by(res, strain, medium, experimentator, replicate) %>%
-#   mutate(value = value/max(value)) %>% 
+#   mutate(value = value/max(value)) %>%
 #   ggplot(aes(x = strain, y = value, color = experimentator)) +
 #   geom_quasirandom() +
 #   facet_wrap(~ medium) +

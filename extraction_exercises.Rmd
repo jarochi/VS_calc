@@ -8,18 +8,19 @@ css: theme.css
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.width = 5)
 library(dplyr)
 library(readODS)
 library(reshape2)
 library(ggplot2)
 library(ggbeeswarm)
-library(tidyverse)
 
 source("./functions/read_CV.R")
 
 
 res <- read_cv("./CrystalViolet", "./CrystalViolet-scheme/")
+
+no_neg_res <- filter(res, medium != "NEG")
 ```
 
 ## Overview
@@ -49,7 +50,6 @@ Strains used:
 - 5276
 
 The selected strains were used because they formed the strongest biofilms. 
-In addition, we had a comparison with the figures from the publication.
 
 ## Methods
 
@@ -62,218 +62,18 @@ To account for normalization and baselining, we are using Spearman's correlation
 ## Crystal Violet (CV)
 
 ```{r}
-ggplot(res, aes(x = strain, y = value, color = experimentator)) +
+ggplot(no_neg_res, aes(x = strain, y = value, color = experimentator)) +
   geom_boxplot() +
   facet_wrap(~ medium) +
   theme_bw()
 ```
 
-Red points represent medians.
 
-## Crystal Violet (CV). Result by day.
-
-```{r}
-ggplot(res, aes(x = strain, y = value, color = experimentator)) +
-  geom_boxplot() +
-  facet_grid(cols = vars(medium), rows = vars(exp_date)) +
-  theme_bw()
-```
-
-Red points represent medians.
-
-## CV: medium. Quasirandom.
+## Crystal Violet (CV)
 
 ```{r}
-ggplot(res, aes(x = strain, y = value, color = experimentator)) +
+ggplot(no_neg_res, aes(x = strain, y = value, color = experimentator)) +
   geom_quasirandom() +
   facet_wrap(~ medium) +
   theme_bw()
 ```
-
-## CV: medium. Result by day. Quasirandom.
-
-```{r}
-ggplot(res, aes(x = strain, y = value, color = experimentator)) +
-  geom_quasirandom() +
-  facet_grid(cols = vars(medium), rows = vars(exp_date)) +
-  theme_bw()
-```
-
-## CV: median.
-
-```{r}
-group_by(res, strain, medium, experimentator, replicate) %>% 
-  summarise(value = median(value)) %>% 
-  ggplot(aes(x = strain, y = value, color = experimentator)) +
-  geom_point(size = 3) +
-  facet_wrap(~ medium) +
-  theme_bw()
-```
-
-## CV: median. Result by day.
-
-```{r}
-group_by(res, strain, medium, experimentator, replicate, exp_date) %>% 
-  summarise(value = median(value)) %>% 
-  ggplot(aes(x = strain, y = value, color = experimentator)) +
-  geom_point(size = 3) +
-  facet_grid(cols = vars(medium), rows = vars(exp_date)) +
-  theme_bw()
-```
-
-## Congo red (CR)
-
-```{r,warning=FALSE}
-cr_cf_dat <- read.csv("data/2018-08-17_CR_CF_format.csv", na.strings = TRUE)
-
-cr <- select(cr_cf_dat, 1L:6) 
-colnames(cr) <- c("strain", "pathotype", "Ania", "Dominika", "Joanna", "Jule")
-cr <- select(cr, -pathotype)
-
-cr_df <- cr %>% 
-  # gather(key = "strain", value = c(Ania, Dominika, Joanna, Jule))
-  # filter(Ania != "", Dominika != "", Joanna != "", Jule != "") %>% 
-  select(Ania, Dominika, Joanna, Jule) %>% gather(key = "experimentator", value = "phenotype") %>% 
-  cbind(cr) %>% 
-  select(-Ania, -Dominika, -Joanna) %>% 
-  mutate(concordance = as.character(phenotype) == as.character(Jule)) %>% 
-  mutate(phenotype = factor(phenotype))
-
-
-# Popracować nad wykresem
-p <- ggplot(cr_df, aes(x = strain, y = experimentator, fill = phenotype, shape = concordance)) +
-  geom_tile(color = "black") +
-  geom_point(size = 4) +
-  scale_x_discrete("Strain") +
-  scale_y_discrete("Measurement date") +
-  scale_fill_discrete("Phenotype") +
-  scale_shape_manual("Concordance", values = c(NA, 16), guide = FALSE) +
-  theme_bw()
-
-
-p
-```
-
-Points denote experiments where results from 2017 and 2018 are in the agreement.
-
-<!-- ## Congo red (CR) -->
-
-<!-- ```{r,warning=FALSE} -->
-<!-- p -->
-<!-- ``` -->
-
-Why there are no CR measurements for strains 5275 and 5276?
-
-## CR (2017 and 2018)
-
-<style>
-.column-left1{
-  float: left;
-  width: 45%;
-  text-align: left;
-}
-
-.column-right1{
-  float: right;
-  width: 45%;
-  text-align: right;
-}
-</style>
-
-
-<div class="column-left1">
-R2018.
-<br>
-<img class="fit" src="data/CR_CF_plates_17-08-2018/kontrola1_17.08.jpg"">
-<br>
-Improper streaking.
-</div>
-
-<div class="column-right1">
-R2017
-<br>
-<img class="fit" src="data/CR_CF_plates_17-08-2018/kontrola2_17.08.jpg"">
-</div>
-
-
-## CR2018
-
-<div class="column-left1">
-<img class="fit" src="data/CR_CF_plates_17-08-2018/kontrola3_17.08.jpg">
-</div>
-
-<div class="column-right1">
-<img class="fit" src="data/CR_CF_plates_17-08-2018/próba1_17.08.jpg">
-</div>
-
-## CR2018
-
-<div class="column-left1">
-<img class="fit" src="data/CR_CF_plates_17-08-2018/próba2_17.08.jpg">
-</div>
-
-<div class="column-right1">
-<img class="fit" src="data/CR_CF_plates_17-08-2018/próba3_17.08.jpg">
-</div>
-
-
-## Calcofluor
-
-```{r,warning=FALSE}
-cr_cf_dat <- read.csv("data/2018-08-17_CR_CF_format.csv")
-
-cf <- select(cr_cf_dat, c(1, 7:10))
-colnames(cf) <- c("strain", "Ania", "Dominika", "Joanna", "Jule")
-
-cf_df <- cf %>% 
-  # gather(key = "strain", value = c(Ania, Dominika, Joanna, Jule))
-  # filter(Ania != "", Dominika != "", Joanna != "", Jule != "") %>% 
-  select(Ania, Dominika, Joanna, Jule) %>% 
-  gather(key = "experimentator", value = "result") %>% 
-  cbind(cf) %>% 
-  select(-Ania, -Dominika, -Joanna) %>% 
-  mutate(concordance = as.character(result) == as.character(Jule)) %>% 
-  mutate(result = factor(result))
-
-ggplot(cf_df, aes(x = strain, y = experimentator, fill = result, shape = concordance)) +
-  geom_tile(color = "black") +
-  geom_point(size = 4) +
-  scale_x_discrete("Strain") +
-  scale_y_discrete("Measurement date") +
-  scale_fill_discrete("Phenotype") +
-  scale_shape_manual("Concordance", values = c(NA, 16), guide = FALSE) +
-  theme_bw()
-
-```
-
-Points denote experiments where results from 2017 and 2018 are in the agreement.
-
-## Calcofluor 2017 and 2018
-
-<div class="column-left1">
-R2018.
-<br>
-<img class="fit" src="data/CR_CF_plates_17-08-2018/ania_17.08.jpg">
-</div>
-
-<div class="column-right1">
-R2017
-<br>
-<img class="fit" src="data/CR_CF_plates_17-08-2018/asia_17.08.jpg">
-</div>
-
-## CF2018
-
-<div class="column-left1">
-<img class="fit" src="data/CR_CF_plates_17-08-2018/koza_17.08.jpg">
-</div>
-
-<!-- <div class="column-right1"> -->
-<!-- <img class="fit" src="data/CR_CF_plates_17-08-2018/CF3.jpg"> -->
-<!-- </div> -->
-
-## Conclusions
-
-1. Repeat experiments (each person separately performs the whole procedure: three replicates of VS and CV and only once CR and CF).
-2. Improve quality of data: naming convention of files, put CV, CR and CF results in the electronic format in the dropbox repository.
-3. Improve quality of streaking and photos.
