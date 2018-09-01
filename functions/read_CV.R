@@ -8,11 +8,7 @@ library(reshape2)
 
 read_cv <- function(cv_dir, scheme_dir) {
   
-  if(Sys.info()[["nodename"]]=="MSI-GE60-2PE"){
-    seq_path <- "/home/jarek/Dropbox/amyloidy/BTU_Senftenberg/BTU_2018_AL-DK-JS"
-  }
-  
-  all_files <- list.files(paste0(seq_path, cv_dir), full.names = TRUE)
+  all_files <- list.files(cv_dir, full.names = TRUE)
   
   lapply(all_files, function(ith_file) {
     cv_data <- readODS::read_ods(ith_file, col_names = FALSE) %>%
@@ -38,7 +34,7 @@ read_cv <- function(cv_dir, scheme_dir) {
     # TO DO: check if works correctly on more templates    
     scheme_name <- paste0(experiment_metadata[5], ".csv")
     
-    plate_scheme <- read.csv(paste0(seq_path, scheme_dir, "/", scheme_name), header = FALSE) %>% 
+    plate_scheme <- read.csv(paste0(scheme_dir, "/", scheme_name), header = FALSE) %>% 
       as.matrix()
     
     colnames(plate_scheme) <- LETTERS[1L:12]
