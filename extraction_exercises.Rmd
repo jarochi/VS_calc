@@ -20,11 +20,25 @@ opts_chunk$set(echo = FALSE, fig.width = 9.5)
 
 source("./functions/read_CV.R")
 
+<<<<<<< HEAD
 if(Sys.info()[["nodename"]]=="MSI-GE60-2PE"){
   seq_path <- "/home/jarek/Dropbox/amyloidy/BTU_Senftenberg/BTU_2018_AL-DK-JS"
 }
 
 cv2018 <- read_cv(paste0(seq_path, "/CrystalViolet"), paste0(seq_path, "/96_plate-scheme/"))
+=======
+# JAREK - fix me
+if(Sys.info()[["nodename"]]=="MSI-GE60-2PE") {
+  seq_path <- "/home/jarek/Dropbox/amyloidy/BTU_Senftenberg/BTU_2018_AL-DK-JS"
+}
+
+# JAREK - fix me
+if(Sys.info()[["nodename"]] == "amyloid") {
+  dat_path <- "/home/michal/Dropbox/dropbox-amylogram/BTU_Senftenberg/BTU_2018_AL-DK-JS/CrystalViolet/"
+}
+
+cv2018 <- read_cv(dat_path, "./CrystalViolet-scheme/")
+>>>>>>> 8ac0322d5a66b7e034ace643d3e47ffe112fba67
 
 no_neg_cv2018 <- filter(cv2018, medium != "NEG")
 
