@@ -16,6 +16,7 @@ library(magrittr)
 library(ggbeeswarm)
 library(knitr)
 
+fot_seq <- "/home/jarek/Dropbox/amyloidy/BTU_Senftenberg/BTU_2018_AL-DK-JS/CongoRed CalcoFluor/CR_CF_plates_05-08-2018/"
 
 get_last_character <- function(x) {
   len_x <- nchar(x)
@@ -489,7 +490,7 @@ Why there are no CR measurements for strains 5275 and 5276?
 <div class="column-left1">
 R2018.
 <br>
-<img class="fit" src="data/CR1.jpg"">
+<img class="fit" src="data/CR_CF_plates_05-08-2018/CR1.jpg"">
 <br>
 Improper streaking.
 </div>
@@ -497,18 +498,18 @@ Improper streaking.
 <div class="column-right1">
 R2017
 <br>
-<img class="fit" src="data/jule.jpg"">
+<img class="fit" src="data/CR_CF_plates_05-08-2018/jule.jpg"">
 </div>
 
 
 ## CR2018
 
 <div class="column-left1">
-<img class="fit" src="data/CR2.jpg">
+<img class="fit" src="data/CR_CF_plates_05-08-2018/CR2.jpg">
 </div>
 
 <div class="column-right1">
-<img class="fit" src="data/CR3.jpg">
+<img class="fit" src="data/CR_CF_plates_05-08-2018/CR3.jpg">
 </div>
 
 
@@ -545,7 +546,7 @@ Points denote experiments where results from 2017 and 2018 are in the agreement.
 <div class="column-left1">
 R2018.
 <br>
-<img class="fit" src="data/CF1.jpg">
+<img class="fit" src="data/CR_CF_plates_05-08-2018/CF1.jpg">
 <br>
 Improper streaking - too dense colonies.
 </div>
@@ -553,17 +554,17 @@ Improper streaking - too dense colonies.
 <div class="column-right1">
 R2017
 <br>
-<img class="fit" src="data/jule1.jpg">
+<img class="fit" src="data/CR_CF_plates_05-08-2018/jule1.jpg">
 </div>
 
 ## CF2018
 
 <div class="column-left1">
-<img class="fit" src="data/CF2.jpg">
+<img class="fit" src="data/CR_CF_plates_05-08-2018/CF2.jpg">
 </div>
 
 <div class="column-right1">
-<img class="fit" src="data/CF3.jpg">
+<img class="fit" src="data/CR_CF_plates_05-08-2018/CF3.jpg">
 </div>
 
 ## Conclusions
@@ -573,7 +574,7 @@ R2017
 3. Improve quality of streaking and photos.
 
 
-## VideoScan 24 hours
+## VideoScan 24 hours - 4, column swap
 
 Filename: **ProjektDevC003707-2018-07-26-Koza-Biofilm.csv**.
 
@@ -589,7 +590,7 @@ ggplot(VS_all_K_1, aes(x = date, y = value)) +
 
 Red points represent medians.
 
-## VS24: Pearson's correlation
+## VS24: Pearson's correlation - 4, column swap
 
 <style>
 .column-left{
@@ -624,7 +625,7 @@ group_by(VS_aggr_K_1, medium) %>%
 ```
 </div>
 
-## VS24: Spearman's correlation
+## VS24: Spearman's correlation - 4, column swap
 
 <div class="column-left">
 ```{r}
