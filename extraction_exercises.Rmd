@@ -20,8 +20,11 @@ opts_chunk$set(echo = FALSE, fig.width = 9.5)
 
 source("./functions/read_CV.R")
 
+if(Sys.info()[["nodename"]]=="MSI-GE60-2PE"){
+  seq_path <- "/home/jarek/Dropbox/amyloidy/BTU_Senftenberg/BTU_2018_AL-DK-JS"
+}
 
-cv2018 <- read_cv("./CrystalViolet", "./CrystalViolet-scheme/")
+cv2018 <- read_cv(paste0(seq_path, "/CrystalViolet"), paste0(seq_path, "/96_plate-scheme/"))
 
 no_neg_cv2018 <- filter(cv2018, medium != "NEG")
 
@@ -30,7 +33,7 @@ get_last_character <- function(x) {
   substr(x, len_x, len_x)
 }
 
-cv2017 <- read.csv2("data/cv_and_videoscan.csv") %>% 
+cv2017 <- read.csv2(paste0(seq_path, "/data/cv_and_videoscan.csv")) %>% 
   mutate(strain = factor(strain)) %>% 
   melt(variable.name = "experiment") %>% 
   mutate(method = ifelse(grepl("CV", experiment), "CV", "Videoscan"),
